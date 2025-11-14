@@ -10,6 +10,9 @@ import random
 import argparse
 from dataclasses import dataclass
 from typing import Tuple, Dict, Any, List
+import json
+import os
+
 
 import torch
 import torch.nn as nn
@@ -294,7 +297,7 @@ def evaluate(model, loader, device):
 
 def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
                  device: torch.device, num_workers: int = 4, round: int = 0, 
-                 weights = None, hyperparams = None):
+                 weights = None):
     
     train_loader, test_loader = build_dataloaders(cfg.batch_size, num_workers)
 
@@ -304,9 +307,7 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
         drop_rate=0.0, attn_drop_rate=0.0, drop_path_rate=cfg.drop_path_rate).to(device)
     
     if weights != None:
-        pass
-    if hyperparams != None:
-        pass
+        model.load_state_dict(weights) #in case the model is partially trained
     
     optimizer = AdamW(model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay, betas=(0.9, 0.999), eps=1e-8)
     scaler = torch.cuda.amp.GradScaler(enabled=torch.cuda.is_available())
@@ -365,65 +366,139 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
         print("Best epoch:", best["epoch"], "val_acc=", best["val_acc"])
     return ({"config": cfg, "best_acc": best_acc}, model)
 
+#----------------------------
+# Hyperparameter Search
+#----------------------------
+def hyperparameter_search(model_class, grid: dict, epochs: int, warmup_epochs: int,
+                          min_lr: float, device: torch.device, num_workers: int = 4,
+                          weights = None) -> Tuple[torch.nn.Module, dict]:
+    """
+    Perform grid search over hyperparameters.
+
+    Args:
+        model_class: Class of the model (e.g., ViTSmallCIFAR)
+        grid: Dictionary with hyperparameter lists: {"lr": [...], "weight_decay": [...], "batch_size": [...], "drop_path_rate": [...]}
+        epochs: Number of epochs for this grid search
+        warmup_epochs: Warmup epochs
+        min_lr: Minimum LR for scheduler
+        device: torch.device
+        num_workers: dataloader workers
+
+    Returns:
+        best_model: The model with the best validation accuracy
+        best_hyperparams: Hyperparameter combo corresponding to best_model
+    """
+    search_space = list(itertools.product(grid["lr"], grid["weight_decay"], grid["batch_size"], grid["drop_path_rate"]))
+    print(f"Total runs for {epochs} epochs: {len(search_space)}")
+
+    best_acc_overall = float("-inf")
+    best_model = None
+    best_hyperparams = None
+    round_counter = 0
+    results: List[Dict[str, Any]] = []
+    random.shuffle(search_space)
+    for i, (lr, wd, bs, dpr) in enumerate(search_space, 1):
+        if i < 5:
+            round_counter += 1
+            print("\n" + "=" * 64)
+            print(f"Run {i}/{len(search_space)} | lr={lr} wd={wd} bs={bs} drop_path_rate={dpr}")
+            print("=" * 64)
+
+            cfg = RunConfig(lr=lr, weight_decay=wd, batch_size=bs, drop_path_rate=dpr)
+            res, mdl = run_training(cfg, epochs=epochs, warmup_epochs=warmup_epochs,
+                                    min_lr=min_lr, device=device, num_workers=num_workers, 
+                                    round=round_counter, weights = weights)
+            results.append(res)
+
+            # Update best model & hyperparameters
+            if res["best_acc"] > best_acc_overall:
+                best_acc_overall = res["best_acc"]
+                best_model = mdl
+                best_hyperparams = {
+                    "lr": lr,
+                    "batch_size": bs,
+                    "weight_decay": wd,
+                    "drop_path_rate": dpr,
+                    "epochs": epochs,
+                    "warmup_epochs": warmup_epochs,
+                    "min_lr": min_lr,
+                    "round": round_counter
+                }
+
+    # Sort results for leaderboard
+    results = sorted(results, key=lambda r: r["best_acc"], reverse=True)
+    print(f"\nLeaderboard for {epochs} epochs:")
+    for rank, r in enumerate(results, 1):
+        cfg = r["config"]
+        print(f"{rank:2d}) acc={r['best_acc']*100:5.2f}% | lr={cfg.lr} wd={cfg.weight_decay} "
+              f"bs={cfg.batch_size} dpr={cfg.drop_path_rate}")
+
+    return best_model, best_hyperparams
+
 # ---------------------------
-# Grid Search
+# main
 # ---------------------------
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--epoch_list", type=int, default=[3, 3, 3])
+    parser.add_argument("--epoch_list", type=int, nargs="+", default=[3, 3, 3])
     parser.add_argument("--warmup_epochs", type=int, default=5)
     parser.add_argument("--min_lr", type=float, default=1e-5)
     parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
 
-    # Default grids. Adjust as needed.
     parser.add_argument("--lrs", type=float, nargs="+", default=[1e-4, 2e-4, 3e-4, 5e-4, 8e-4])
-    parser.add_argument("--wds", type=float, nargs="+",default=[0.02, 0.05, 0.07, 0.10, 0.15])
+    parser.add_argument("--wds", type=float, nargs="+", default=[0.02, 0.05, 0.07, 0.10, 0.15])
     parser.add_argument("--bss", type=int, nargs="+", default=[128, 192, 256, 384, 512])
     parser.add_argument("--dprs", type=float, nargs="+", default=[0.00, 0.05, 0.10, 0.15, 0.20])
 
     args = parser.parse_args()
     set_seed(args.seed)
-    epoch_list = args.epoch_list
-    #create model
-    
-    for epochs in epoch_list:
-        #TODO: load trained model with selected hyperparams
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        print("device:", device)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print("device:", device)
 
-        search_space = list(itertools.product(args.lrs, args.wds, args.bss, args.dprs))
-        print(f"total runs: {len(search_space)}")
-        results: List[Dict[str, Any]] = []
+    grid = {
+        "lr": args.lrs,
+        "weight_decay": args.wds,
+        "batch_size": args.bss,
+        "drop_path_rate": args.dprs
+    }
+    #init
+    start_all = time.time()
+    round = 0
+    timestamp = datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d_%H-%M-%S")
+    folder_path = f"training @ {timestamp}"
+    os.makedirs(folder_path, exist_ok=True)
+    weights = None
+    #starting loop
+    for epochs in args.epoch_list:
+        round += 1
+        path = os.path.join(folder_path, f"round_{round}")
+        os.makedirs(path, exist_ok = True)
+        best_model, best_hyperparams = hyperparameter_search(
+            model_class=ViTSmallCIFAR,
+            grid=grid,
+            epochs=epochs,
+            warmup_epochs=args.warmup_epochs,
+            min_lr=args.min_lr,
+            device=device,
+            num_workers=args.num_workers,
+            weights = weights
+        )
 
-        start_all = time.time()
-        round = 0
-        for i, (lr, wd, bs, dpr) in enumerate(search_space, 1):
-            if i < 5: #TODO: made just so I can run faster. Please remove when actually testing.
-                round += 1
-                print("\n" + "=" * 64)
-                print(f"run {i}/{len(search_space)} | lr={lr} wd={wd} bs={bs} drop_path_rate={dpr}")
-                print("=" * 64)
-                cfg = RunConfig(lr=lr, weight_decay=wd, batch_size=bs, drop_path_rate=dpr)
-                res, mdl = run_training(cfg, epochs=epochs, warmup_epochs=args.warmup_epochs,
-                                min_lr=args.min_lr, device=device, num_workers=args.num_workers, 
-                                round=round)
-                results.append(res)
-                #TODO: Save model weights and hyperparams somewhere
-                timestamp = datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d %H:%M:%S")
-                torch.save(mdl.state_dict(), f"model_weights_round{i}_time_{timestamp}.pth")
+        # Save the best model & hyperparameters
+        if best_model is not None:
+            weights = best_model.state_dict()
+            weights_path = os.path.join(path, "best_model_weights.pth")
+            hyperparameters_path = os.path.join(path, "best_hyperparams.json")
+            torch.save(best_model.state_dict(), weights_path)
+            print(f"Saved best model weights to {weights_path}")
+            with open(hyperparameters_path, "w") as f:
+                json.dump(best_hyperparams, f, indent=4)
+            print(f"Saved best hyperparameters to {hyperparameters_path}")
 
-        elapsed = time.time() - start_all
-        print(f"\nGrid search finished in {elapsed/60:.1f} min\n")
-
-        # Leaderboard
-        results = sorted(results, key=lambda r: r["best_acc"], reverse=True)
-        print("Leaderboard (best test accuracy):")
-        for rank, r in enumerate(results, 1):
-            cfg = r["config"]
-            print(f"{rank:2d}) acc={r['best_acc']*100:5.2f}% | lr={cfg.lr} wd={cfg.weight_decay} bs={cfg.batch_size} dpr={cfg.drop_path_rate}")
-        #TODO: move best model into separate folder
+    elapsed = time.time() - start_all
+    print(f"\nGrid search finished in {elapsed/60:.1f} min")
 
 if __name__ == "__main__":
     main()
