@@ -213,8 +213,8 @@ class ViTSmallCIFAR(nn.Module):
 # ---------------------------
 # Data
 # ---------------------------
-
-def build_dataloaders(batch_size: int, num_workers: int = 4, train_sample: int = 200, test_sample: int = 100) -> Tuple[DataLoader, DataLoader]:
+#TODO: made data much smaller to test code on my computer. Make datasets larger
+def build_dataloaders(batch_size: int, num_workers: int = 4, train_sample: int = 600, test_sample: int = 100) -> Tuple[DataLoader, DataLoader]:
     # Standard CIFAR-10 augments
     train_tf = transforms.Compose([
         transforms.RandomCrop(32, padding=4),
@@ -297,7 +297,7 @@ def evaluate(model, loader, device):
 
 def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
                  device: torch.device, num_workers: int = 4, round: int = 0, 
-                 weights = None):
+                 weights = None, completed_epochs = None):
     
     train_loader, test_loader = build_dataloaders(cfg.batch_size, num_workers)
 
@@ -315,6 +315,9 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
     total_steps = epochs * math.ceil(50000 / cfg.batch_size)
     warmup_steps = warmup_epochs * math.ceil(50000 / cfg.batch_size)
     scheduler = WarmupCosineLR(optimizer, total_steps=total_steps, warmup_steps=warmup_steps, min_lr=min_lr)
+    #TODO: might want to toggle off. Seems like you might want smaller learning rate when transitioning between hyperparameters
+    if completed_epochs != None:
+        scheduler.last_epoch = completed_epochs * math.ceil(50000 / cfg.batch_size) - 1
 
     best_acc = 0.0
     visualizer = TV() #initialize TrainingVisualizer
@@ -371,7 +374,7 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
 #----------------------------
 def hyperparameter_search(model_class, grid: dict, epochs: int, warmup_epochs: int,
                           min_lr: float, device: torch.device, num_workers: int = 4,
-                          weights = None) -> Tuple[torch.nn.Module, dict]:
+                          weights = None, completed_epochs = None) -> Tuple[torch.nn.Module, dict]:
     """
     Perform grid search over hyperparameters.
 
@@ -396,7 +399,7 @@ def hyperparameter_search(model_class, grid: dict, epochs: int, warmup_epochs: i
     best_hyperparams = None
     round_counter = 0
     results: List[Dict[str, Any]] = []
-    random.shuffle(search_space)
+    #random.shuffle(search_space)
     for i, (lr, wd, bs, dpr) in enumerate(search_space, 1):
         if i < 5:
             round_counter += 1
@@ -407,7 +410,7 @@ def hyperparameter_search(model_class, grid: dict, epochs: int, warmup_epochs: i
             cfg = RunConfig(lr=lr, weight_decay=wd, batch_size=bs, drop_path_rate=dpr)
             res, mdl = run_training(cfg, epochs=epochs, warmup_epochs=warmup_epochs,
                                     min_lr=min_lr, device=device, num_workers=num_workers, 
-                                    round=round_counter, weights = weights)
+                                    round=round_counter, weights = weights, completed_epochs = completed_epochs)
             results.append(res)
 
             # Update best model & hyperparameters
@@ -441,7 +444,7 @@ def hyperparameter_search(model_class, grid: dict, epochs: int, warmup_epochs: i
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--epoch_list", type=int, nargs="+", default=[3, 3, 3])
+    parser.add_argument("--epoch_list", type=int, nargs="+", default=[10, 10, 10])
     parser.add_argument("--warmup_epochs", type=int, default=5)
     parser.add_argument("--min_lr", type=float, default=1e-5)
     parser.add_argument("--num_workers", type=int, default=4)
@@ -471,6 +474,7 @@ def main():
     os.makedirs(folder_path, exist_ok=True)
     weights = None
     #starting loop
+    completed_epochs = 0
     for epochs in args.epoch_list:
         round += 1
         path = os.path.join(folder_path, f"round_{round}")
@@ -483,7 +487,8 @@ def main():
             min_lr=args.min_lr,
             device=device,
             num_workers=args.num_workers,
-            weights = weights
+            weights = weights,
+            completed_epochs = completed_epochs
         )
 
         # Save the best model & hyperparameters
@@ -496,6 +501,7 @@ def main():
             with open(hyperparameters_path, "w") as f:
                 json.dump(best_hyperparams, f, indent=4)
             print(f"Saved best hyperparameters to {hyperparameters_path}")
+        completed_epochs += epochs #mark the number of completed epochs
 
     elapsed = time.time() - start_all
     print(f"\nGrid search finished in {elapsed/60:.1f} min")
