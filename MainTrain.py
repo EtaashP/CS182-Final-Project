@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from typing import Tuple, Dict, Any, List
 import json
 import os
+import copy
 
 
 import torch
@@ -214,7 +215,7 @@ class ViTSmallCIFAR(nn.Module):
 # Data
 # ---------------------------
 #TODO: made data much smaller to test code on my computer. Make datasets larger
-def build_dataloaders(batch_size: int, num_workers: int = 4, train_sample: int = 600, test_sample: int = 100) -> Tuple[DataLoader, DataLoader]:
+def build_dataloaders(batch_size: int, num_workers: int = 4, train_sample: int = 300, test_sample: int = 100) -> Tuple[DataLoader, DataLoader]:
     # Standard CIFAR-10 augments
     train_tf = transforms.Compose([
         transforms.RandomCrop(32, padding=4),
@@ -238,9 +239,9 @@ def build_dataloaders(batch_size: int, num_workers: int = 4, train_sample: int =
 
 
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,
-                              num_workers=num_workers, pin_memory=True)
+                              num_workers=num_workers, pin_memory=torch.cuda.is_available())
     test_loader = DataLoader(test_ds, batch_size=min(512, test_sample), shuffle=False,
-                             num_workers=num_workers, pin_memory=True)
+                             num_workers=num_workers, pin_memory=torch.cuda.is_available())
     return train_loader, test_loader
 
 # ---------------------------
@@ -266,7 +267,9 @@ def train_one_epoch(model, loader, optimizer, scaler, device, mixup_alpha=None):
         targets = targets.to(device, non_blocking=True)
 
         optimizer.zero_grad(set_to_none=True)
-        with torch.cuda.amp.autocast(enabled=torch.cuda.is_available()):
+        use_amp = torch.cuda.is_available()  # only enable autocast on CUDA GPU
+        with torch.amp.autocast("cuda", enabled=use_amp):
+        #with torch.cuda.amp.autocast(enabled=torch.cuda.is_available()):
             logits = model(images)
             loss = criterion(logits, targets)
 
@@ -297,29 +300,31 @@ def evaluate(model, loader, device):
 
 def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
                  device: torch.device, num_workers: int = 4, round: int = 0, 
-                 weights = None, completed_epochs = None):
+                 checkpoint = None):
     
     train_loader, test_loader = build_dataloaders(cfg.batch_size, num_workers)
-
     model = ViTSmallCIFAR(
         num_classes=10, img_size=32, patch_size=4,
         embed_dim=384, depth=12, num_heads=6, mlp_ratio=4.0,
         drop_rate=0.0, attn_drop_rate=0.0, drop_path_rate=cfg.drop_path_rate).to(device)
-    
-    if weights != None:
-        model.load_state_dict(weights) #in case the model is partially trained
-    
     optimizer = AdamW(model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay, betas=(0.9, 0.999), eps=1e-8)
     scaler = torch.cuda.amp.GradScaler(enabled=torch.cuda.is_available())
-
-    total_steps = epochs * math.ceil(50000 / cfg.batch_size)
-    warmup_steps = warmup_epochs * math.ceil(50000 / cfg.batch_size)
+    #so that scheduler updates with training size automatically
+    steps_per_epoch = len(train_loader)
+    total_steps = epochs * steps_per_epoch
+    warmup_steps = warmup_epochs * steps_per_epoch
     scheduler = WarmupCosineLR(optimizer, total_steps=total_steps, warmup_steps=warmup_steps, min_lr=min_lr)
-    #TODO: might want to toggle off. Seems like you might want smaller learning rate when transitioning between hyperparameters
-    if completed_epochs != None:
-        scheduler.last_epoch = completed_epochs * math.ceil(50000 / cfg.batch_size) - 1
+    
+    #TODO: if loading from previous stage, restore previous checkpoint
+    curr_epoch = 0 #in case checkpoint is none
+    if checkpoint is not None:
+        model.load_state_dict(checkpoint["model_state"])
+        optimizer.load_state_dict(checkpoint["optimizer_state"])
+        scheduler.load_state_dict(checkpoint["scheduler_state"])
+        curr_epoch = checkpoint["epoch"]  # resume from completed epochs
+        print(f"Resuming from epoch {curr_epoch}")
 
-    best_acc = 0.0
+    best_acc = float('-inf')
     visualizer = TV() #initialize TrainingVisualizer
     # After constructing the model + optimizer:
 
@@ -347,13 +352,16 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
             beta1 = beta1,
             beta2 = beta2
         ) #done storing
-
+        curr_epoch += 1
+        #advance scheduler automatically, scheduler will automatically update the last epoch
+        scheduler.last_epoch = curr_epoch - 1
+        scheduler.step()
         # step LR scheduler per iteration equivalently by calling .step() repeated times.
         # Here we approximate by stepping once per epoch across epoch-length steps:
         # do it properly: step per batch in train loop would be ideal.
         # Quick fix: recompute steps done and set last_epoch accordingly.
-        scheduler.last_epoch = (epoch + 1) * math.ceil(50000 / cfg.batch_size) - 1
-        scheduler.step()
+        '''scheduler.last_epoch = (epoch + 1) * math.ceil(50000 / cfg.batch_size) - 1
+        scheduler.step()'''
 
         print(f"epoch {epoch+1:03d}/{epochs} | loss {train_loss:.4f} | train_acc {train_acc*100:5.2f}% | test_acc {test_acc*100:5.2f}% | time {(time.time() - time_start):5.2f}(s)")
     t = time.time()
@@ -362,19 +370,26 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
     saved = visualizer.save_csv(filename)
     print("Saved training log to", saved)
 
+    #save training checkpoint
+    checkpoint = {
+    "epoch": curr_epoch,
+    "model_state": model.state_dict(),
+    "optimizer_state": optimizer.state_dict(),
+    "scheduler_state": scheduler.state_dict()}
+
     # optionally examine the best epoch
     best = visualizer.get_best_epoch(metric="val_acc")
-
     if best is not None:
         print("Best epoch:", best["epoch"], "val_acc=", best["val_acc"])
-    return ({"config": cfg, "best_acc": best_acc}, model)
+
+    return ({"config": cfg, "best_acc": best_acc}, checkpoint)
 
 #----------------------------
 # Hyperparameter Search
 #----------------------------
 def hyperparameter_search(model_class, grid: dict, epochs: int, warmup_epochs: int,
                           min_lr: float, device: torch.device, num_workers: int = 4,
-                          weights = None, completed_epochs = None) -> Tuple[torch.nn.Module, dict]:
+                          checkpoint = None) -> Tuple[torch.nn.Module, dict]:
     """
     Perform grid search over hyperparameters.
 
@@ -408,15 +423,15 @@ def hyperparameter_search(model_class, grid: dict, epochs: int, warmup_epochs: i
             print("=" * 64)
 
             cfg = RunConfig(lr=lr, weight_decay=wd, batch_size=bs, drop_path_rate=dpr)
-            res, mdl = run_training(cfg, epochs=epochs, warmup_epochs=warmup_epochs,
+            res, checkpoint = run_training(cfg, epochs=epochs, warmup_epochs=warmup_epochs,
                                     min_lr=min_lr, device=device, num_workers=num_workers, 
-                                    round=round_counter, weights = weights, completed_epochs = completed_epochs)
+                                    round=round_counter, checkpoint = copy.deepcopy(checkpoint))
             results.append(res)
 
             # Update best model & hyperparameters
             if res["best_acc"] > best_acc_overall:
                 best_acc_overall = res["best_acc"]
-                best_model = mdl
+                best_checkpoint = copy.deepcopy(checkpoint)
                 best_hyperparams = {
                     "lr": lr,
                     "batch_size": bs,
@@ -436,7 +451,7 @@ def hyperparameter_search(model_class, grid: dict, epochs: int, warmup_epochs: i
         print(f"{rank:2d}) acc={r['best_acc']*100:5.2f}% | lr={cfg.lr} wd={cfg.weight_decay} "
               f"bs={cfg.batch_size} dpr={cfg.drop_path_rate}")
 
-    return best_model, best_hyperparams
+    return best_checkpoint, best_hyperparams
 
 # ---------------------------
 # main
@@ -472,14 +487,14 @@ def main():
     timestamp = datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d_%H-%M-%S")
     folder_path = f"training @ {timestamp}"
     os.makedirs(folder_path, exist_ok=True)
-    weights = None
+    checkpoint = None
     #starting loop
     completed_epochs = 0
     for epochs in args.epoch_list:
         round += 1
         path = os.path.join(folder_path, f"round_{round}")
         os.makedirs(path, exist_ok = True)
-        best_model, best_hyperparams = hyperparameter_search(
+        best_checkpoint, best_hyperparams = hyperparameter_search(
             model_class=ViTSmallCIFAR,
             grid=grid,
             epochs=epochs,
@@ -487,16 +502,15 @@ def main():
             min_lr=args.min_lr,
             device=device,
             num_workers=args.num_workers,
-            weights = weights,
-            completed_epochs = completed_epochs
+            checkpoint = copy.deepcopy(checkpoint)
         )
 
         # Save the best model & hyperparameters
-        if best_model is not None:
-            weights = best_model.state_dict()
+        if best_checkpoint is not None:
+            weights = best_checkpoint['model_state']
             weights_path = os.path.join(path, "best_model_weights.pth")
             hyperparameters_path = os.path.join(path, "best_hyperparams.json")
-            torch.save(best_model.state_dict(), weights_path)
+            torch.save(weights, weights_path)
             print(f"Saved best model weights to {weights_path}")
             with open(hyperparameters_path, "w") as f:
                 json.dump(best_hyperparams, f, indent=4)
