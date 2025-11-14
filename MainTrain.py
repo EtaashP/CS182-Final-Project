@@ -4,6 +4,7 @@
 
 import math
 import time
+from datetime import datetime
 import itertools
 import random
 import argparse
@@ -292,15 +293,21 @@ def evaluate(model, loader, device):
     return total_acc / n
 
 def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
-                 device: torch.device, num_workers: int = 4) -> Dict[str, Any]:
+                 device: torch.device, num_workers: int = 4, round: int = 0, 
+                 weights = None, hyperparams = None):
     
     train_loader, test_loader = build_dataloaders(cfg.batch_size, num_workers)
+
     model = ViTSmallCIFAR(
         num_classes=10, img_size=32, patch_size=4,
         embed_dim=384, depth=12, num_heads=6, mlp_ratio=4.0,
-        drop_rate=0.0, attn_drop_rate=0.0, drop_path_rate=cfg.drop_path_rate
-    ).to(device)
-
+        drop_rate=0.0, attn_drop_rate=0.0, drop_path_rate=cfg.drop_path_rate).to(device)
+    
+    if weights != None:
+        pass
+    if hyperparams != None:
+        pass
+    
     optimizer = AdamW(model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay, betas=(0.9, 0.999), eps=1e-8)
     scaler = torch.cuda.amp.GradScaler(enabled=torch.cuda.is_available())
 
@@ -310,7 +317,10 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
 
     best_acc = 0.0
     visualizer = TV() #initialize TrainingVisualizer
+    # After constructing the model + optimizer:
+
     for epoch in range(epochs):
+        time_start = time.time()
         train_loss, train_acc = train_one_epoch(model, train_loader, optimizer, scaler, device)
         test_acc = evaluate(model, test_loader, device)
         best_acc = max(best_acc, test_acc)
@@ -318,6 +328,7 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
         lr = optimizer.param_groups[0]['lr']
         wd = optimizer.param_groups[0]['weight_decay']
         beta1, beta2 = optimizer.param_groups[0]['betas']
+        #print('betas', beta1, beta2)
         drop_path_rate = cfg.drop_path_rate  # if constant, still can plot
         batch_size = cfg.batch_size
         visualizer.update(
@@ -340,10 +351,10 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
         scheduler.last_epoch = (epoch + 1) * math.ceil(50000 / cfg.batch_size) - 1
         scheduler.step()
 
-        print(f"epoch {epoch+1:03d}/{epochs} | loss {train_loss:.4f} | train_acc {train_acc*100:5.2f}% | test_acc {test_acc*100:5.2f}%")
-
-    
-    filename = f"logs/run_lr{cfg.lr}_wd{cfg.weight_decay}_bs{cfg.batch_size}_dpr{cfg.drop_path_rate}.csv"
+        print(f"epoch {epoch+1:03d}/{epochs} | loss {train_loss:.4f} | train_acc {train_acc*100:5.2f}% | test_acc {test_acc*100:5.2f}% | time {(time.time() - time_start):5.2f}(s)")
+    t = time.time()
+    timestamp = datetime.fromtimestamp(t).strftime("%Y-%m-%d %H:%M:%S")
+    filename = f"logs/round_{round} @ time {timestamp}.csv"
     saved = visualizer.save_csv(filename)
     print("Saved training log to", saved)
 
@@ -352,10 +363,7 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
 
     if best is not None:
         print("Best epoch:", best["epoch"], "val_acc=", best["val_acc"])
-    return {
-        "config": cfg,
-        "best_acc": best_acc
-    }
+    return ({"config": cfg, "best_acc": best_acc}, model)
 
 # ---------------------------
 # Grid Search
@@ -363,7 +371,7 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--epochs", type=int, default=10)
+    parser.add_argument("--epoch_list", type=int, default=[3, 3, 3])
     parser.add_argument("--warmup_epochs", type=int, default=5)
     parser.add_argument("--min_lr", type=float, default=1e-5)
     parser.add_argument("--num_workers", type=int, default=4)
@@ -377,33 +385,45 @@ def main():
 
     args = parser.parse_args()
     set_seed(args.seed)
+    epoch_list = args.epoch_list
+    #create model
+    
+    for epochs in epoch_list:
+        #TODO: load trained model with selected hyperparams
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        print("device:", device)
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print("device:", device)
+        search_space = list(itertools.product(args.lrs, args.wds, args.bss, args.dprs))
+        print(f"total runs: {len(search_space)}")
+        results: List[Dict[str, Any]] = []
 
-    search_space = list(itertools.product(args.lrs, args.wds, args.bss, args.dprs))
-    print(f"total runs: {len(search_space)}")
-    results: List[Dict[str, Any]] = []
+        start_all = time.time()
+        round = 0
+        for i, (lr, wd, bs, dpr) in enumerate(search_space, 1):
+            if i < 5: #TODO: made just so I can run faster. Please remove when actually testing.
+                round += 1
+                print("\n" + "=" * 64)
+                print(f"run {i}/{len(search_space)} | lr={lr} wd={wd} bs={bs} drop_path_rate={dpr}")
+                print("=" * 64)
+                cfg = RunConfig(lr=lr, weight_decay=wd, batch_size=bs, drop_path_rate=dpr)
+                res, mdl = run_training(cfg, epochs=epochs, warmup_epochs=args.warmup_epochs,
+                                min_lr=args.min_lr, device=device, num_workers=args.num_workers, 
+                                round=round)
+                results.append(res)
+                #TODO: Save model weights and hyperparams somewhere
+                timestamp = datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d %H:%M:%S")
+                torch.save(mdl.state_dict(), f"model_weights_round{i}_time_{timestamp}.pth")
 
-    start_all = time.time()
-    for i, (lr, wd, bs, dpr) in enumerate(search_space, 1):
-        print("\n" + "=" * 64)
-        print(f"run {i}/{len(search_space)} | lr={lr} wd={wd} bs={bs} drop_path_rate={dpr}")
-        print("=" * 64)
-        cfg = RunConfig(lr=lr, weight_decay=wd, batch_size=bs, drop_path_rate=dpr)
-        res = run_training(cfg, epochs=args.epochs, warmup_epochs=args.warmup_epochs,
-                           min_lr=args.min_lr, device=device, num_workers=args.num_workers)
-        results.append(res)
+        elapsed = time.time() - start_all
+        print(f"\nGrid search finished in {elapsed/60:.1f} min\n")
 
-    elapsed = time.time() - start_all
-    print(f"\nGrid search finished in {elapsed/60:.1f} min\n")
-
-    # Leaderboard
-    results = sorted(results, key=lambda r: r["best_acc"], reverse=True)
-    print("Leaderboard (best test accuracy):")
-    for rank, r in enumerate(results, 1):
-        cfg = r["config"]
-        print(f"{rank:2d}) acc={r['best_acc']*100:5.2f}% | lr={cfg.lr} wd={cfg.weight_decay} bs={cfg.batch_size} dpr={cfg.drop_path_rate}")
+        # Leaderboard
+        results = sorted(results, key=lambda r: r["best_acc"], reverse=True)
+        print("Leaderboard (best test accuracy):")
+        for rank, r in enumerate(results, 1):
+            cfg = r["config"]
+            print(f"{rank:2d}) acc={r['best_acc']*100:5.2f}% | lr={cfg.lr} wd={cfg.weight_decay} bs={cfg.batch_size} dpr={cfg.drop_path_rate}")
+        #TODO: move best model into separate folder
 
 if __name__ == "__main__":
     main()

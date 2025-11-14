@@ -1,50 +1,65 @@
-# vit_visualizer.py
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 import pandas as pd
+import numpy as np
+
 
 class TrainingVisualizer:
     """
-    Lightweight logger that collects per-epoch metrics and hyperparameters.
-    - Call `update(epoch, **kwargs)` each epoch (kwargs can include train_loss, train_acc, val_acc,
-      lr, weight_decay, batch_size, drop_path_rate, etc.).
-    - After training, call `to_dataframe()` or `save_csv(filename)`.
+    Robust logger for training.
 
-    This class:
-    - Converts simple torch/numpy scalars via .item() when possible.
-    - Keeps raw lists of records which convert to a DataFrame on demand.
-    - Provides helper `get_best_epoch()` to find the best epoch by a metric.
+    Features:
+      - Global (run-level) hyperparameters: saved once, injected into every epoch.
+      - Per-epoch metrics: train_loss, val_acc, lr, batch_size, etc.
+      - Safe scalar conversion, but containers (list/tuple/dict) preserved.
+      - Guaranteed stable column schema across epochs.
     """
 
     def __init__(self) -> None:
         self._records: List[Dict[str, Any]] = []
+        self._globals: Dict[str, Any] = {}    # global hyperparameters
 
-    # -------------------------
+    # ------------------------------------------------------------
     # Public API
-    # -------------------------
+    # ------------------------------------------------------------
+    def set_global(self, **kwargs: Any) -> None:
+        """
+        Set run-level (global) hyperparameters.
+        These will be injected into every epoch's record.
+        """
+        for k, v in kwargs.items():
+            self._globals[k] = self._safe_scalar(v)
+
     def update(self, epoch: int, **kwargs: Any) -> None:
         """
-        Record one epoch. `epoch` should be an int (1-based preferred).
-        kwargs: arbitrary keys (train_loss, train_acc, val_acc, lr, weight_decay, ...).
-        Scalars that have `.item()` (torch / numpy scalars) will be converted to Python numbers.
+        Log per-epoch metrics (train_loss, val_acc, lr, etc.)
+        Automatically includes global hyperparameters.
         """
         rec: Dict[str, Any] = {"epoch": int(epoch)}
+
+        # add global hyperparameters EVERY epoch
+        rec.update(self._globals)
+
+        # add per-epoch values
         for k, v in kwargs.items():
-            rec[k] = self._safe_scalar(v)
+            rec[k] = v
         self._records.append(rec)
 
     def to_dataframe(self) -> pd.DataFrame:
-        """Return a pandas DataFrame with all collected records (may be empty)."""
+        """Return a pandas DataFrame with a stable schema."""
         if not self._records:
-            # return empty DataFrame with a predictable schema
             return pd.DataFrame(columns=["epoch"])
-        return pd.DataFrame(self._records)
+
+        # Use from_records: more stable than pd.DataFrame(list_of_dicts)
+        df = pd.DataFrame.from_records(self._records)
+
+        # Guarantee column ordering: epoch first, globals next, epoch metrics last
+        cols = ["epoch"] + sorted(self._globals.keys()) + \
+               [c for c in df.columns if c not in self._globals and c != "epoch"]
+        df = df[cols]
+        return df
 
     def save_csv(self, filename: str, index: bool = False) -> str:
-        """
-        Save collected records to CSV. Creates parent directories if necessary.
-        Returns the final filename used (absolute path as string).
-        """
         df = self.to_dataframe()
         out_path = Path(filename)
         if out_path.parent and not out_path.parent.exists():
@@ -53,51 +68,49 @@ class TrainingVisualizer:
         return str(out_path.resolve())
 
     def reset(self) -> None:
-        """Clear all collected records (so the same object can be reused for another run)."""
         self._records = []
+        self._globals = {}
 
     def get_best_epoch(self, metric: str = "val_acc") -> Optional[Dict[str, Any]]:
-        """
-        Return the record (dict) of the row with max(metric).
-        If metric is not present or no records, returns None.
-        """
         df = self.to_dataframe()
         if df.empty or metric not in df.columns:
             return None
         idx = df[metric].idxmax()
         return df.loc[idx].to_dict()
 
-    # -------------------------
-    # Internal helpers
-    # -------------------------
+    # ------------------------------------------------------------
+    # Internal helper
+    # ------------------------------------------------------------
     @staticmethod
     def _safe_scalar(v: Any) -> Any:
         """
-        Convert torch.tensor / numpy scalar to Python scalar if possible.
-        Leave lists/dicts/strings alone.
+        Convert torch/numpy scalar to Python scalar when appropriate.
+        Preserve list/tuple/dict containers exactly.
         """
-        # strings/bytes: keep as-is
+
+        # Preserve containers (important for Adam betas)
+        if isinstance(v, (list, tuple, dict)):
+            return v
+
+        # Strings unchanged
         if isinstance(v, (str, bytes)):
             return v
 
-        # try .item() for torch scalar or numpy scalar or 0-d numpy array
+        # torch/numpy scalar via .item()
         try:
             if hasattr(v, "item") and callable(v.item):
-                # Some objects (large arrays) have item but will raise if not scalar,
-                # so guard with try/except.
-                try:
+                # Only use item() if it's 0-d (true scalar)
+                if getattr(v, "ndim", 0) == 0:
                     return v.item()
-                except Exception:
-                    print("error does not exist:", v)
         except Exception:
             pass
 
-        # if it's a one-element list/tuple/np.ndarray convert to scalar, otherwise keep structure
+        # numpy 0-d array
         try:
-            import numpy as _np
-            if isinstance(v, _np.ndarray) and v.size == 1:
+            if isinstance(v, np.ndarray) and v.ndim == 0:
                 return v.item()
         except Exception:
-            print("error does not exist:", v)
+            pass
 
+        # fallback (non-scalar object preserved)
         return v
