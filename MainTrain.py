@@ -17,6 +17,12 @@ from torch.utils.data import DataLoader
 from torch.optim import AdamW
 from torch.optim.lr_scheduler import _LRScheduler
 from torchvision import datasets, transforms
+#extra libraries so I can test everything locally
+import random
+from torch.utils.data import Subset
+#importing something to visualize training process
+from visualizer import TrainingVisualizer as TV
+
 
 # ---------------------------
 # Utilities
@@ -204,7 +210,7 @@ class ViTSmallCIFAR(nn.Module):
 # Data
 # ---------------------------
 
-def build_dataloaders(batch_size: int, num_workers: int = 4) -> Tuple[DataLoader, DataLoader]:
+def build_dataloaders(batch_size: int, num_workers: int = 4, train_sample: int = 200, test_sample: int = 100) -> Tuple[DataLoader, DataLoader]:
     # Standard CIFAR-10 augments
     train_tf = transforms.Compose([
         transforms.RandomCrop(32, padding=4),
@@ -221,10 +227,15 @@ def build_dataloaders(batch_size: int, num_workers: int = 4) -> Tuple[DataLoader
 
     train_ds = datasets.CIFAR10(root="./data", train=True, transform=train_tf, download=True)
     test_ds = datasets.CIFAR10(root="./data", train=False, transform=test_tf, download=True)
+    indices_train = random.sample(range(len(train_ds)), train_sample)
+    indices_test = random.sample(range(len(test_ds)), test_sample)
+    train_ds = Subset(train_ds, indices_train)
+    test_ds = Subset(test_ds, indices_test)
+
 
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,
                               num_workers=num_workers, pin_memory=True)
-    test_loader = DataLoader(test_ds, batch_size=512, shuffle=False,
+    test_loader = DataLoader(test_ds, batch_size=min(512, test_sample), shuffle=False,
                              num_workers=num_workers, pin_memory=True)
     return train_loader, test_loader
 
@@ -282,6 +293,7 @@ def evaluate(model, loader, device):
 
 def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
                  device: torch.device, num_workers: int = 4) -> Dict[str, Any]:
+    
     train_loader, test_loader = build_dataloaders(cfg.batch_size, num_workers)
     model = ViTSmallCIFAR(
         num_classes=10, img_size=32, patch_size=4,
@@ -297,10 +309,29 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
     scheduler = WarmupCosineLR(optimizer, total_steps=total_steps, warmup_steps=warmup_steps, min_lr=min_lr)
 
     best_acc = 0.0
+    visualizer = TV() #initialize TrainingVisualizer
     for epoch in range(epochs):
         train_loss, train_acc = train_one_epoch(model, train_loader, optimizer, scaler, device)
         test_acc = evaluate(model, test_loader, device)
         best_acc = max(best_acc, test_acc)
+        #storing data for training visualizer
+        lr = optimizer.param_groups[0]['lr']
+        wd = optimizer.param_groups[0]['weight_decay']
+        beta1, beta2 = optimizer.param_groups[0]['betas']
+        drop_path_rate = cfg.drop_path_rate  # if constant, still can plot
+        batch_size = cfg.batch_size
+        visualizer.update(
+            epoch+1,
+            train_loss=train_loss,
+            train_acc=train_acc,
+            val_acc=test_acc,
+            lr=lr,
+            weight_decay=wd,
+            drop_path_rate=drop_path_rate,
+            batch_size=batch_size,
+            beta1 = beta1,
+            beta2 = beta2
+        ) #done storing
 
         # step LR scheduler per iteration equivalently by calling .step() repeated times.
         # Here we approximate by stepping once per epoch across epoch-length steps:
@@ -311,6 +342,16 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
 
         print(f"epoch {epoch+1:03d}/{epochs} | loss {train_loss:.4f} | train_acc {train_acc*100:5.2f}% | test_acc {test_acc*100:5.2f}%")
 
+    
+    filename = f"logs/run_lr{cfg.lr}_wd{cfg.weight_decay}_bs{cfg.batch_size}_dpr{cfg.drop_path_rate}.csv"
+    saved = visualizer.save_csv(filename)
+    print("Saved training log to", saved)
+
+    # optionally examine the best epoch
+    best = visualizer.get_best_epoch(metric="val_acc")
+
+    if best is not None:
+        print("Best epoch:", best["epoch"], "val_acc=", best["val_acc"])
     return {
         "config": cfg,
         "best_acc": best_acc
@@ -322,7 +363,7 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--epochs", type=int, default=60)
+    parser.add_argument("--epochs", type=int, default=10)
     parser.add_argument("--warmup_epochs", type=int, default=5)
     parser.add_argument("--min_lr", type=float, default=1e-5)
     parser.add_argument("--num_workers", type=int, default=4)
