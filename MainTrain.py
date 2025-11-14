@@ -215,7 +215,7 @@ class ViTSmallCIFAR(nn.Module):
 # Data
 # ---------------------------
 #TODO: made data much smaller to test code on my computer. Make datasets larger
-def build_dataloaders(batch_size: int, num_workers: int = 4, train_sample: int = 300, test_sample: int = 100) -> Tuple[DataLoader, DataLoader]:
+def build_dataloaders(batch_size: int, num_workers: int = 4, train_sample: int = 500, test_sample: int = 100) -> Tuple[DataLoader, DataLoader]:
     # Standard CIFAR-10 augments
     train_tf = transforms.Compose([
         transforms.RandomCrop(32, padding=4),
@@ -232,8 +232,10 @@ def build_dataloaders(batch_size: int, num_workers: int = 4, train_sample: int =
 
     train_ds = datasets.CIFAR10(root="./data", train=True, transform=train_tf, download=True)
     test_ds = datasets.CIFAR10(root="./data", train=False, transform=test_tf, download=True)
-    indices_train = random.sample(range(len(train_ds)), train_sample)
-    indices_test = random.sample(range(len(test_ds)), test_sample)
+    #indices_train = random.sample(range(len(train_ds)), train_sample)
+    #indices_test = random.sample(range(len(test_ds)), test_sample)
+    indices_train = list(range(train_sample))
+    indices_test  = list(range(test_sample))
     train_ds = Subset(train_ds, indices_train)
     test_ds = Subset(test_ds, indices_test)
 
@@ -255,7 +257,7 @@ class RunConfig:
     batch_size: int
     drop_path_rate: float
 
-def train_one_epoch(model, loader, optimizer, scaler, device, mixup_alpha=None):
+def train_one_epoch(model, loader, optimizer, scaler, scheduler, device, mixup_alpha=None):
     model.train()
     total_loss = 0.0
     total_acc = 0.0
@@ -276,11 +278,14 @@ def train_one_epoch(model, loader, optimizer, scaler, device, mixup_alpha=None):
         scaler.scale(loss).backward()
         scaler.step(optimizer)
         scaler.update()
+        if scheduler is not None:
+            scheduler.step()
 
         bs = images.size(0)
         total_loss += loss.item() * bs
         total_acc += accuracy(logits.detach(), targets) * bs
         n += bs
+
 
     return total_loss / n, total_acc / n
 
@@ -319,9 +324,9 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
     curr_epoch = 0 #in case checkpoint is none
     if checkpoint is not None:
         model.load_state_dict(checkpoint["model_state"])
-        optimizer.load_state_dict(checkpoint["optimizer_state"])
+        '''optimizer.load_state_dict(checkpoint["optimizer_state"])
         scheduler.load_state_dict(checkpoint["scheduler_state"])
-        curr_epoch = checkpoint["epoch"]  # resume from completed epochs
+        curr_epoch = checkpoint["epoch"]  # resume from completed epochs'''
         print(f"Resuming from epoch {curr_epoch}")
 
     best_acc = float('-inf')
@@ -330,7 +335,7 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
 
     for epoch in range(epochs):
         time_start = time.time()
-        train_loss, train_acc = train_one_epoch(model, train_loader, optimizer, scaler, device)
+        train_loss, train_acc = train_one_epoch(model, train_loader, optimizer, scaler, scheduler, device)
         test_acc = evaluate(model, test_loader, device)
         best_acc = max(best_acc, test_acc)
         #storing data for training visualizer
@@ -354,8 +359,6 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
         ) #done storing
         curr_epoch += 1
         #advance scheduler automatically, scheduler will automatically update the last epoch
-        scheduler.last_epoch = curr_epoch - 1
-        scheduler.step()
         # step LR scheduler per iteration equivalently by calling .step() repeated times.
         # Here we approximate by stepping once per epoch across epoch-length steps:
         # do it properly: step per batch in train loop would be ideal.
@@ -410,20 +413,21 @@ def hyperparameter_search(model_class, grid: dict, epochs: int, warmup_epochs: i
     print(f"Total runs for {epochs} epochs: {len(search_space)}")
 
     best_acc_overall = float("-inf")
+    best_checkpoint = None
     best_model = None
     best_hyperparams = None
     round_counter = 0
     results: List[Dict[str, Any]] = []
     #random.shuffle(search_space)
     for i, (lr, wd, bs, dpr) in enumerate(search_space, 1):
-        if i < 5:
+        if i < 2:
             round_counter += 1
             print("\n" + "=" * 64)
             print(f"Run {i}/{len(search_space)} | lr={lr} wd={wd} bs={bs} drop_path_rate={dpr}")
             print("=" * 64)
 
             cfg = RunConfig(lr=lr, weight_decay=wd, batch_size=bs, drop_path_rate=dpr)
-            res, checkpoint = run_training(cfg, epochs=epochs, warmup_epochs=warmup_epochs,
+            res, train_checkpoint = run_training(cfg, epochs=epochs, warmup_epochs=warmup_epochs,
                                     min_lr=min_lr, device=device, num_workers=num_workers, 
                                     round=round_counter, checkpoint = copy.deepcopy(checkpoint))
             results.append(res)
@@ -431,7 +435,7 @@ def hyperparameter_search(model_class, grid: dict, epochs: int, warmup_epochs: i
             # Update best model & hyperparameters
             if res["best_acc"] > best_acc_overall:
                 best_acc_overall = res["best_acc"]
-                best_checkpoint = copy.deepcopy(checkpoint)
+                best_checkpoint = copy.deepcopy(train_checkpoint)
                 best_hyperparams = {
                     "lr": lr,
                     "batch_size": bs,
@@ -467,7 +471,8 @@ def main():
 
     parser.add_argument("--lrs", type=float, nargs="+", default=[1e-4, 2e-4, 3e-4, 5e-4, 8e-4])
     parser.add_argument("--wds", type=float, nargs="+", default=[0.02, 0.05, 0.07, 0.10, 0.15])
-    parser.add_argument("--bss", type=int, nargs="+", default=[128, 192, 256, 384, 512])
+    #parser.add_argument("--bss", type=int, nargs="+", default=[128, 192, 256, 384, 512])
+    parser.add_argument("--bss", type=int, nargs="+", default=[64, 128, 192, 256, 384])
     parser.add_argument("--dprs", type=float, nargs="+", default=[0.00, 0.05, 0.10, 0.15, 0.20])
 
     args = parser.parse_args()
