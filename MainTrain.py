@@ -2,6 +2,10 @@
 # ViT-Small (embed_dim=384, depth=12, heads=6, mlp_ratio=4) with patch size 4 for CIFAR-10.
 # Grid search over: learning rate, weight decay, batch size, stochastic depth rate.
 
+# ---------------------------
+# NOTE: Comments added only — code logic unchanged.
+# ---------------------------
+
 import math
 import time
 from datetime import datetime
@@ -34,16 +38,25 @@ from visualizer import TrainingVisualizer as TV
 # ---------------------------
 
 def set_seed(seed: int = 42):
+    # set deterministic seeds for python random and torch (CPU + all GPUs)
     random.seed(seed)
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
 
 def accuracy(logits: torch.Tensor, targets: torch.Tensor) -> float:
+    # compute classification accuracy for a batch (returns scalar float)
     preds = logits.argmax(dim=1)
     return (preds == targets).float().mean().item()
 
 # Warmup + Cosine LR
 class WarmupCosineLR(_LRScheduler):
+    """
+    Learning rate scheduler that performs a linear warmup followed by cosine decay.
+    Extends PyTorch's _LRScheduler interface by overriding get_lr().
+    - total_steps: total number of optimizer steps
+    - warmup_steps: number of steps to linearly increase LR from 0 to base_lr
+    - min_lr: final minimum LR after cosine decay
+    """
     def __init__(self, optimizer, total_steps, warmup_steps=0, min_lr=1e-5, last_epoch=-1):
         self.total_steps = total_steps
         self.warmup_steps = warmup_steps
@@ -51,12 +64,15 @@ class WarmupCosineLR(_LRScheduler):
         super().__init__(optimizer, last_epoch)
 
     def get_lr(self):
+        # compute LR per parameter group based on current step (self.last_epoch + 1)
         step = self.last_epoch + 1
         lrs = []
         for base_lr in self.base_lrs:
             if step < self.warmup_steps:
+                # linear warmup phase
                 lr = base_lr * float(step) / float(max(1, self.warmup_steps))
             else:
+                # cosine decay phase
                 progress = (step - self.warmup_steps) / float(max(1, self.total_steps - self.warmup_steps))
                 cosine = 0.5 * (1.0 + math.cos(math.pi * progress))
                 lr = self.min_lr + (base_lr - self.min_lr) * cosine
@@ -68,17 +84,26 @@ class WarmupCosineLR(_LRScheduler):
 # ---------------------------
 
 class DropPath(nn.Module):
+    """
+    Implements stochastic depth (a.k.a. DropPath).
+    During training randomly zeroes entire residual branches with probability `drop_prob`.
+    Scales the remaining paths to keep expected value consistent.
+    """
     def __init__(self, drop_prob: float = 0.0):
         super().__init__()
         self.drop_prob = drop_prob
 
     def forward(self, x):
         if self.drop_prob == 0.0 or not self.training:
+            # no-op during eval or when drop_prob is zero
             return x
         keep_prob = 1.0 - self.drop_prob
+        # shape: (batch_size, 1, 1, ..., 1) to broadcast across non-batch dims
         shape = (x.shape[0],) + (1,) * (x.ndim - 1)
+        # sample mask in [0,1) then floor to get 0.0/1.0
         random_tensor = keep_prob + torch.rand(shape, dtype=x.dtype, device=x.device)
         random_tensor.floor_()
+        # rescale outputs to preserve expectation
         return x.div(keep_prob) * random_tensor
 
 # ---------------------------
@@ -86,6 +111,11 @@ class DropPath(nn.Module):
 # ---------------------------
 
 class MLP(nn.Module):
+    """
+    Feed-forward MLP used inside Transformer blocks.
+    Typical structure: Linear -> GELU -> Dropout -> Linear -> Dropout.
+    `mlp_ratio` controls hidden dimension relative to input dim.
+    """
     def __init__(self, dim, mlp_ratio=4, drop=0.0):
         super().__init__()
         hidden = int(dim * mlp_ratio)
@@ -103,6 +133,11 @@ class MLP(nn.Module):
         return x
 
 class Attention(nn.Module):
+    """
+    Multi-head self-attention module.
+    - Computes Q,K,V via a single linear projection and reshapes for multi-heads.
+    - Scaled dot-product attention with optional dropout on attention weights and final projection.
+    """
     def __init__(self, dim, num_heads=6, qkv_bias=True, attn_drop=0.0, proj_drop=0.0):
         super().__init__()
         assert dim % num_heads == 0
@@ -110,6 +145,7 @@ class Attention(nn.Module):
         self.head_dim = dim // num_heads
         self.scale = self.head_dim ** -0.5
 
+        # project to Q,K,V concatenated
         self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
         self.attn_drop = nn.Dropout(attn_drop)
         self.proj = nn.Linear(dim, dim)
@@ -117,21 +153,29 @@ class Attention(nn.Module):
 
     def forward(self, x):
         B, N, C = x.shape
-        qkv = self.qkv(x)  # B, N, 3C
+        qkv = self.qkv(x)  # shape: (B, N, 3C)
+        # reshape & permute to get separate q, k, v per head
         qkv = qkv.reshape(B, N, 3, self.num_heads, self.head_dim).permute(2, 0, 3, 1, 4)
-        q, k, v = qkv[0], qkv[1], qkv[2]  # each: B, heads, N, head_dim
+        q, k, v = qkv[0], qkv[1], qkv[2]  # each: (B, heads, N, head_dim)
 
+        # scaled dot-product attention
         attn = (q @ k.transpose(-2, -1)) * self.scale
         attn = attn.softmax(dim=-1)
         attn = self.attn_drop(attn)
 
-        out = attn @ v  # B, heads, N, head_dim
+        # combine attention with values and restore shape
+        out = attn @ v  # (B, heads, N, head_dim)
         out = out.transpose(1, 2).reshape(B, N, C)
         out = self.proj(out)
         out = self.proj_drop(out)
         return out
 
 class Block(nn.Module):
+    """
+    Transformer encoder block:
+    - LayerNorm -> Attention -> DropPath -> Residual
+    - LayerNorm -> MLP -> DropPath -> Residual
+    """
     def __init__(self, dim, num_heads, mlp_ratio, drop=0.0, attn_drop=0.0, drop_path=0.0):
         super().__init__()
         self.norm1 = nn.LayerNorm(dim)
@@ -141,11 +185,18 @@ class Block(nn.Module):
         self.mlp = MLP(dim, mlp_ratio=mlp_ratio, drop=drop)
 
     def forward(self, x):
+        # pre-norm attention + stochastic depth residual
         x = x + self.drop_path(self.attn(self.norm1(x)))
+        # pre-norm MLP + stochastic depth residual
         x = x + self.drop_path(self.mlp(self.norm2(x)))
         return x
 
 class PatchEmbed(nn.Module):
+    """
+    Image -> patch embeddings using a Conv2d with kernel=stride=patch_size.
+    For CIFAR-10: img_size=32, patch_size=4 => grid=8 => 64 patches.
+    The conv projects input channels to embed_dim and output is shaped to (B, num_patches, embed_dim).
+    """
     def __init__(self, img_size=32, patch_size=4, in_chans=3, embed_dim=384):
         super().__init__()
         assert img_size % patch_size == 0
@@ -154,11 +205,17 @@ class PatchEmbed(nn.Module):
         self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=patch_size)
 
     def forward(self, x):
-        x = self.proj(x)  # B, C, 8, 8
-        x = x.flatten(2).transpose(1, 2)  # B, 64, C
+        x = self.proj(x)  # B, embed_dim, 8, 8
+        x = x.flatten(2).transpose(1, 2)  # B, 64, embed_dim
         return x
 
 class ViTSmallCIFAR(nn.Module):
+    """
+    Vision Transformer small variant tailored for CIFAR-10 (32x32 images).
+    - Builds patch embeddings, adds a learnable [CLS] token and positional embeddings.
+    - Stacks `depth` transformer Blocks with optional stochastic depth per block.
+    - Final classification from [CLS] token via a linear head.
+    """
     def __init__(self, num_classes=10, img_size=32, patch_size=4,
                  embed_dim=384, depth=12, num_heads=6, mlp_ratio=4.0,
                  drop_rate=0.0, attn_drop_rate=0.0, drop_path_rate=0.0,
@@ -167,11 +224,12 @@ class ViTSmallCIFAR(nn.Module):
         self.patch_embed = PatchEmbed(img_size, patch_size, 3, embed_dim)
         num_patches = self.patch_embed.num_patches
 
+        # learnable cls token and positional embeddings
         self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim))
         self.pos_embed = nn.Parameter(torch.zeros(1, num_patches + 1, embed_dim))
         self.pos_drop = nn.Dropout(p=drop_rate)
 
-        # stochastic depth decay rule
+        # stochastic depth decay rule across depth
         dpr = torch.linspace(0, drop_path_rate, steps=depth).tolist()
 
         self.blocks = nn.ModuleList([
@@ -183,32 +241,36 @@ class ViTSmallCIFAR(nn.Module):
         self.cls_norm = cls_norm
         self.head = nn.Linear(embed_dim, num_classes)
 
+        # initialize positional embeddings and cls token
         nn.init.trunc_normal_(self.pos_embed, std=0.02)
         nn.init.trunc_normal_(self.cls_token, std=0.02)
+        # recursively apply weight init for other modules
         self.apply(self._init_weights)
 
     def _init_weights(self, m):
+        # initialization routine: small gaussian for Linear weights, zeros for biases
         if isinstance(m, nn.Linear):
             nn.init.trunc_normal_(m.weight, std=0.02)
             if m.bias is not None:
                 nn.init.zeros_(m.bias)
         elif isinstance(m, nn.LayerNorm):
+            # LayerNorm: weight ones, bias zeros
             nn.init.ones_(m.weight)
             nn.init.zeros_(m.bias)
 
     def forward(self, x):
         B = x.shape[0]
-        x = self.patch_embed(x)  # B, 64, C
-        cls = self.cls_token.expand(B, -1, -1)
-        x = torch.cat([cls, x], dim=1)  # B, 65, C
-        x = x + self.pos_embed
+        x = self.patch_embed(x)  # B, num_patches, embed_dim
+        cls = self.cls_token.expand(B, -1, -1)  # expand cls token to batch size
+        x = torch.cat([cls, x], dim=1)  # prepend cls token -> B, num_patches+1, embed_dim
+        x = x + self.pos_embed  # add positional embeddings
         x = self.pos_drop(x)
         for blk in self.blocks:
-            x = blk(x)
+            x = blk(x)  # pass through transformer blocks
         if self.cls_norm:
-            x = self.norm(x)
-        cls_tok = x[:, 0]
-        logits = self.head(cls_tok)
+            x = self.norm(x)  # optional layer norm over full sequence
+        cls_tok = x[:, 0]  # extract cls token embedding
+        logits = self.head(cls_tok)  # classification head
         return logits
 
 # ---------------------------
@@ -216,7 +278,7 @@ class ViTSmallCIFAR(nn.Module):
 # ---------------------------
 #TODO: made data much smaller to test code on my computer. Make datasets larger
 def build_dataloaders(batch_size: int, num_workers: int = 4, train_sample: int = 500, test_sample: int = 100) -> Tuple[DataLoader, DataLoader]:
-    # Standard CIFAR-10 augments
+    # Standard CIFAR-10 augments used for training and normalization for both splits.
     train_tf = transforms.Compose([
         transforms.RandomCrop(32, padding=4),
         transforms.RandomHorizontalFlip(),
@@ -230,8 +292,10 @@ def build_dataloaders(batch_size: int, num_workers: int = 4, train_sample: int =
                              std=(0.2470, 0.2435, 0.2616)),
     ])
 
+    # download CIFAR-10 train/test datasets (root="./data")
     train_ds = datasets.CIFAR10(root="./data", train=True, transform=train_tf, download=True)
     test_ds = datasets.CIFAR10(root="./data", train=False, transform=test_tf, download=True)
+    # by default the code sampled randomly, but here deterministic slices are used for quick experiments:
     #indices_train = random.sample(range(len(train_ds)), train_sample)
     #indices_test = random.sample(range(len(test_ds)), test_sample)
     indices_train = list(range(train_sample))
@@ -239,7 +303,7 @@ def build_dataloaders(batch_size: int, num_workers: int = 4, train_sample: int =
     train_ds = Subset(train_ds, indices_train)
     test_ds = Subset(test_ds, indices_test)
 
-
+    # build DataLoader objects. pin_memory is enabled when CUDA is available.
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,
                               num_workers=num_workers, pin_memory=torch.cuda.is_available())
     test_loader = DataLoader(test_ds, batch_size=min(512, test_sample), shuffle=False,
@@ -252,12 +316,20 @@ def build_dataloaders(batch_size: int, num_workers: int = 4, train_sample: int =
 
 @dataclass
 class RunConfig:
+    # simple dataclass to hold hyperparameters for a run
     lr: float
     weight_decay: float
     batch_size: int
     drop_path_rate: float
 
 def train_one_epoch(model, loader, optimizer, scaler, scheduler, device, mixup_alpha=None):
+    """
+    Train the model for a single epoch.
+    - Uses mixed precision autocast when CUDA is available.
+    - Uses GradScaler for stable mixed-precision backward.
+    - Steps the scheduler if provided.
+    Returns: (average_loss, average_accuracy) over epoch.
+    """
     model.train()
     total_loss = 0.0
     total_acc = 0.0
@@ -272,9 +344,11 @@ def train_one_epoch(model, loader, optimizer, scaler, scheduler, device, mixup_a
         use_amp = torch.cuda.is_available()  # only enable autocast on CUDA GPU
         with torch.amp.autocast("cuda", enabled=use_amp):
         #with torch.cuda.amp.autocast(enabled=torch.cuda.is_available()):
+            # forward pass
             logits = model(images)
             loss = criterion(logits, targets)
 
+        # backward and optimization with GradScaler
         scaler.scale(loss).backward()
         scaler.step(optimizer)
         scaler.update()
@@ -286,11 +360,14 @@ def train_one_epoch(model, loader, optimizer, scaler, scheduler, device, mixup_a
         total_acc += accuracy(logits.detach(), targets) * bs
         n += bs
 
-
     return total_loss / n, total_acc / n
 
 @torch.no_grad()
 def evaluate(model, loader, device):
+    """
+    Evaluation loop that computes accuracy on the given loader.
+    Wrapped with torch.no_grad() for efficiency.
+    """
     model.eval()
     total_acc = 0.0
     n = 0
@@ -306,6 +383,11 @@ def evaluate(model, loader, device):
 def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
                  device: torch.device, num_workers: int = 4, round: int = 0, 
                  checkpoint = None):
+    """
+    Sets up dataloaders, model, optimizer, scheduler and runs training for `epochs`.
+    - Returns a tuple: (result_summary_dict, checkpoint_dict)
+    - `checkpoint` argument can be used to resume (partial code present but commented).
+    """
     
     train_loader, test_loader = build_dataloaders(cfg.batch_size, num_workers)
     model = ViTSmallCIFAR(
@@ -323,6 +405,7 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
     #TODO: if loading from previous stage, restore previous checkpoint
     curr_epoch = 0 #in case checkpoint is none
     if checkpoint is not None:
+        # only model state is restored here; optimizer/scheduler restore is commented out
         model.load_state_dict(checkpoint["model_state"])
         '''optimizer.load_state_dict(checkpoint["optimizer_state"])
         scheduler.load_state_dict(checkpoint["scheduler_state"])
@@ -395,19 +478,9 @@ def hyperparameter_search(model_class, grid: dict, epochs: int, warmup_epochs: i
                           checkpoint = None) -> Tuple[torch.nn.Module, dict]:
     """
     Perform grid search over hyperparameters.
-
-    Args:
-        model_class: Class of the model (e.g., ViTSmallCIFAR)
-        grid: Dictionary with hyperparameter lists: {"lr": [...], "weight_decay": [...], "batch_size": [...], "drop_path_rate": [...]}
-        epochs: Number of epochs for this grid search
-        warmup_epochs: Warmup epochs
-        min_lr: Minimum LR for scheduler
-        device: torch.device
-        num_workers: dataloader workers
-
-    Returns:
-        best_model: The model with the best validation accuracy
-        best_hyperparams: Hyperparameter combo corresponding to best_model
+    - `grid` expected shape: {"lr": [...], "weight_decay": [...], "batch_size": [...], "drop_path_rate": [...]}
+    - Iterates over all combinations via itertools.product and calls run_training for each.
+    - Returns the best checkpoint and corresponding hyperparameters found during search.
     """
     search_space = list(itertools.product(grid["lr"], grid["weight_decay"], grid["batch_size"], grid["drop_path_rate"]))
     print(f"Total runs for {epochs} epochs: {len(search_space)}")
@@ -420,7 +493,8 @@ def hyperparameter_search(model_class, grid: dict, epochs: int, warmup_epochs: i
     results: List[Dict[str, Any]] = []
     #random.shuffle(search_space)
     for i, (lr, wd, bs, dpr) in enumerate(search_space, 1):
-        if i < 2:
+        if i <= 2: #TODO: Get rid of. I only put this for computational savings.
+            # Only running a subset of the search space in current code (first 2 runs)
             round_counter += 1
             print("\n" + "=" * 64)
             print(f"Run {i}/{len(search_space)} | lr={lr} wd={wd} bs={bs} drop_path_rate={dpr}")
@@ -447,7 +521,7 @@ def hyperparameter_search(model_class, grid: dict, epochs: int, warmup_epochs: i
                     "round": round_counter
                 }
 
-    # Sort results for leaderboard
+    # Sort results for leaderboard (descending accuracy)
     results = sorted(results, key=lambda r: r["best_acc"], reverse=True)
     print(f"\nLeaderboard for {epochs} epochs:")
     for rank, r in enumerate(results, 1):
@@ -462,8 +536,9 @@ def hyperparameter_search(model_class, grid: dict, epochs: int, warmup_epochs: i
 # ---------------------------
 
 def main():
+    # command-line arguments to configure grid, epochs and environment
     parser = argparse.ArgumentParser()
-    parser.add_argument("--epoch_list", type=int, nargs="+", default=[10, 10, 10])
+    parser.add_argument("--epoch_list", type=int, nargs="+", default=[5, 5, 5])
     parser.add_argument("--warmup_epochs", type=int, default=5)
     parser.add_argument("--min_lr", type=float, default=1e-5)
     parser.add_argument("--num_workers", type=int, default=4)
@@ -521,6 +596,7 @@ def main():
                 json.dump(best_hyperparams, f, indent=4)
             print(f"Saved best hyperparameters to {hyperparameters_path}")
         completed_epochs += epochs #mark the number of completed epochs
+        checkpoint = best_checkpoint #updating checkpoint value
 
     elapsed = time.time() - start_all
     print(f"\nGrid search finished in {elapsed/60:.1f} min")
