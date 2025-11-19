@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 __pycache__/
 *.pyc
 *.pyo
@@ -8,3 +9,11 @@ __pycache__/
 .Python
 .DS_Store
 data/
+=======
+data/
+*.tar.gz
+*.zip
+__pycache__/
+*.pt
+*.pth
+>>>>>>> fb66584 (Initial commit without datasets)
