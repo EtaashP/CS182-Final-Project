@@ -281,13 +281,16 @@ def evaluate(model, loader, device):
     return total_acc / n
 
 def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
-                 device: torch.device, num_workers: int = 4) -> Dict[str, Any]:
+                 device: torch.device, num_workers: int = 4,
+                 log_fn=print, initial_state=None) -> Dict[str, Any]:
     train_loader, test_loader = build_dataloaders(cfg.batch_size, num_workers)
     model = ViTSmallCIFAR(
         num_classes=10, img_size=32, patch_size=4,
         embed_dim=384, depth=12, num_heads=6, mlp_ratio=4.0,
         drop_rate=0.0, attn_drop_rate=0.0, drop_path_rate=cfg.drop_path_rate
     ).to(device)
+    if initial_state is not None:
+        model.load_state_dict(initial_state)
 
     optimizer = AdamW(model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay, betas=(0.9, 0.999), eps=1e-8)
     scaler = torch.cuda.amp.GradScaler(enabled=torch.cuda.is_available())
@@ -309,11 +312,12 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
         scheduler.last_epoch = (epoch + 1) * math.ceil(50000 / cfg.batch_size) - 1
         scheduler.step()
 
-        print(f"epoch {epoch+1:03d}/{epochs} | loss {train_loss:.4f} | train_acc {train_acc*100:5.2f}% | test_acc {test_acc*100:5.2f}%")
+        log_fn(f"epoch {epoch+1:03d}/{epochs} | loss {train_loss:.4f} | train_acc {train_acc*100:5.2f}% | test_acc {test_acc*100:5.2f}%")
 
     return {
         "config": cfg,
-        "best_acc": best_acc
+        "best_acc": best_acc,
+        "final_state": {k: v.detach().cpu() for k, v in model.state_dict().items()}
     }
 
 # ---------------------------
@@ -322,52 +326,101 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--epochs", type=int, default=150)
+    parser.add_argument("--epochs", type=int, default=90)
     parser.add_argument("--warmup_epochs", type=int, default=5)
     parser.add_argument("--min_lr", type=float, default=1e-5)
     parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--phase_epochs", type=int, default=None,
+                        help="Override epochs per phase (defaults to total/3).")
 
-    # Default grids. Adjust as needed.
-    # parser.add_argument("--lrs", type=float, nargs="+", default=[1e-4, 3.3e-4, 1e-3])
-    # parser.add_argument("--wds", type=float, nargs="+",default=[0.02, 0.07, 0.15])
-    # parser.add_argument("--bss", type=int, nargs="+", default=[128, 256, 512])
-    # parser.add_argument("--dprs", type=float, nargs="+", default=[0.00, 0.10, 0.20])
+    # Baseline (phase 1) hyperparameters.
+    parser.add_argument("--baseline_lrs", type=float, nargs="+", default=[3.3e-4])
+    parser.add_argument("--baseline_wds", type=float, nargs="+", default=[0.07])
+    parser.add_argument("--baseline_bss", type=int, nargs="+", default=[128])
+    parser.add_argument("--baseline_dprs", type=float, nargs="+", default=[0.20])
 
-    parser.add_argument("--lrs", type=float, nargs="+", default=[3.3e-4])
-    parser.add_argument("--wds", type=float, nargs="+",default=[0.07])
-    parser.add_argument("--bss", type=int, nargs="+", default=[128])
-    parser.add_argument("--dprs", type=float, nargs="+", default=[0.20])
+    # Grid (phases 2 & 3) hyperparameters.
+    parser.add_argument("--grid_lrs", type=float, nargs="+", default=[1e-4, 3.3e-4, 1e-3])
+    parser.add_argument("--grid_wds", type=float, nargs="+", default=[0.02, 0.07, 0.15])
+    parser.add_argument("--grid_bss", type=int, nargs="+", default=[64, 128, 256])
+    parser.add_argument("--grid_dprs", type=float, nargs="+", default=[0.10, 0.20, 0.40])
+    parser.add_argument("--results_out", type=str, default="phase_results.txt",
+                        help="Path to save printed results.")
 
     args = parser.parse_args()
     set_seed(args.seed)
 
+    log_lines: List[str] = []
+    def log(msg: str = ""):
+        print(msg)
+        log_lines.append(msg)
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print("device:", device)
+    log(f"device: {device}")
 
-    search_space = list(itertools.product(args.lrs, args.wds, args.bss, args.dprs))
-    print(f"total runs: {len(search_space)}")
-    results: List[Dict[str, Any]] = []
+    baseline_space = list(itertools.product(args.baseline_lrs, args.baseline_wds,
+                                            args.baseline_bss, args.baseline_dprs))
+    grid_space = list(itertools.product(args.grid_lrs, args.grid_wds,
+                                        args.grid_bss, args.grid_dprs))
 
-    start_all = time.time()
-    for i, (lr, wd, bs, dpr) in enumerate(search_space, 1):
-        print("\n" + "=" * 64)
-        print(f"run {i}/{len(search_space)} | lr={lr} wd={wd} bs={bs} drop_path_rate={dpr}")
-        print("=" * 64)
-        cfg = RunConfig(lr=lr, weight_decay=wd, batch_size=bs, drop_path_rate=dpr)
-        res = run_training(cfg, epochs=args.epochs, warmup_epochs=args.warmup_epochs,
-                           min_lr=args.min_lr, device=device, num_workers=args.num_workers)
-        results.append(res)
+    phase_epochs = args.phase_epochs or args.epochs // 3
+    phase_lengths = [int(phase_epochs/2), phase_epochs, max(1, args.epochs - int(phase_epochs/2)- phase_epochs)]
 
-    elapsed = time.time() - start_all
-    print(f"\nGrid search finished in {elapsed/60:.1f} min\n")
+    def run_phase(search_space, epochs, label, initial_state=None):
+        log(f"\n{label}: total runs={len(search_space)}, epochs per run={epochs}")
+        results: List[Dict[str, Any]] = []
+        start_phase = time.time()
+        for i, (lr, wd, bs, dpr) in enumerate(search_space, 1):
+            log("\n" + "=" * 64)
+            log(f"{label} run {i}/{len(search_space)} | lr={lr} wd={wd} bs={bs} drop_path_rate={dpr}")
+            log("=" * 64)
+            cfg = RunConfig(lr=lr, weight_decay=wd, batch_size=bs, drop_path_rate=dpr)
+            res = run_training(cfg, epochs=epochs, warmup_epochs=args.warmup_epochs,
+                               min_lr=args.min_lr, device=device, num_workers=args.num_workers,
+                               log_fn=log, initial_state=initial_state)
+            results.append(res)
 
-    # Leaderboard
-    results = sorted(results, key=lambda r: r["best_acc"], reverse=True)
-    print("Leaderboard (best test accuracy):")
-    for rank, r in enumerate(results, 1):
-        cfg = r["config"]
-        print(f"{rank:2d}) acc={r['best_acc']*100:5.2f}% | lr={cfg.lr} wd={cfg.weight_decay} bs={cfg.batch_size} dpr={cfg.drop_path_rate}")
+        elapsed_phase = time.time() - start_phase
+        log(f"\n{label} finished in {elapsed_phase/60:.1f} min\n")
+
+        sorted_results = sorted(results, key=lambda r: r["best_acc"], reverse=True)
+        if sorted_results:
+            log(f"{label} leaderboard (best test accuracy):")
+            for rank, r in enumerate(sorted_results, 1):
+                cfg = r["config"]
+                log(f"{rank:2d}) acc={r['best_acc']*100:5.2f}% | lr={cfg.lr} wd={cfg.weight_decay} bs={cfg.batch_size} dpr={cfg.drop_path_rate}")
+        else:
+            log(f"{label} skipped: no configs found.")
+        return sorted_results
+
+    phase_results = []
+    phase1 = run_phase(baseline_space, phase_lengths[0], "Phase 1 (baseline)")
+    phase1_best_state = phase1[0]["final_state"] if phase1 else None
+    phase_results.append(phase1)
+
+    phase2 = run_phase(grid_space, phase_lengths[1], "Phase 2 (grid search)", initial_state=phase1_best_state)
+    phase2_best_state = phase2[0]["final_state"] if phase2 else None
+    phase_results.append(phase2)
+
+    phase3 = run_phase(grid_space, phase_lengths[2], "Phase 3 (grid search)", initial_state=phase2_best_state)
+    phase_results.append(phase3)
+
+    log("\nSummary of best configs per phase:")
+    for label, results in zip(
+        ["Phase 1 (baseline)", "Phase 2 (grid search)", "Phase 3 (grid search)"],
+        phase_results
+    ):
+        if results:
+            best = results[0]["config"]
+            acc = results[0]["best_acc"] * 100
+            log(f"- {label}: {acc:5.2f}% | lr={best.lr} wd={best.weight_decay} bs={best.batch_size} dpr={best.drop_path_rate}")
+        else:
+            log(f"- {label}: no runs executed")
+
+    with open(args.results_out, "w", encoding="utf-8") as f:
+        f.write("\n".join(log_lines))
+    log(f"\nSaved results to {args.results_out}")
 
 if __name__ == "__main__":
     main()

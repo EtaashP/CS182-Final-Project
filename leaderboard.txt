@@ -1,0 +1,1025 @@
+epoch 043/60 | loss 0.7632 | train_acc 72.85% | test_acc 70.32%
+epoch 044/60 | loss 0.7426 | train_acc 73.57% | test_acc 71.48%
+epoch 045/60 | loss 0.7355 | train_acc 73.81% | test_acc 71.96%
+epoch 046/60 | loss 0.7170 | train_acc 74.38% | test_acc 72.31%
+epoch 047/60 | loss 0.6932 | train_acc 75.28% | test_acc 72.51%
+epoch 048/60 | loss 0.6758 | train_acc 75.81% | test_acc 73.10%
+epoch 049/60 | loss 0.6577 | train_acc 76.58% | test_acc 73.04%
+epoch 050/60 | loss 0.6465 | train_acc 76.80% | test_acc 73.32%
+epoch 051/60 | loss 0.6346 | train_acc 77.22% | test_acc 73.86%
+epoch 052/60 | loss 0.6190 | train_acc 77.88% | test_acc 74.27%
+epoch 053/60 | loss 0.6072 | train_acc 78.48% | test_acc 74.36%
+epoch 054/60 | loss 0.5966 | train_acc 78.66% | test_acc 73.96%
+epoch 055/60 | loss 0.5871 | train_acc 79.10% | test_acc 74.25%
+epoch 056/60 | loss 0.5786 | train_acc 79.30% | test_acc 74.86%
+epoch 057/60 | loss 0.5769 | train_acc 79.43% | test_acc 74.69%
+epoch 058/60 | loss 0.5717 | train_acc 79.62% | test_acc 74.74%
+epoch 059/60 | loss 0.5668 | train_acc 79.86% | test_acc 74.48%
+epoch 060/60 | loss 0.5609 | train_acc 79.94% | test_acc 74.61%
+
+================================================================
+run 68/81 | lr=0.001 wd=0.07 bs=256 drop_path_rate=0.1
+================================================================
+epoch 001/60 | loss 2.0622 | train_acc 23.47% | test_acc 26.62%
+epoch 002/60 | loss 1.7992 | train_acc 32.52% | test_acc 40.74%
+epoch 003/60 | loss 1.5048 | train_acc 44.83% | test_acc 44.97%
+epoch 004/60 | loss 1.3685 | train_acc 50.50% | test_acc 53.56%
+epoch 005/60 | loss 1.3437 | train_acc 51.20% | test_acc 53.80%
+epoch 006/60 | loss 1.3664 | train_acc 50.04% | test_acc 48.16%
+epoch 007/60 | loss 1.3952 | train_acc 49.38% | test_acc 49.71%
+epoch 008/60 | loss 1.4156 | train_acc 48.54% | test_acc 49.66%
+epoch 009/60 | loss 1.3981 | train_acc 48.96% | test_acc 50.92%
+epoch 010/60 | loss 1.3722 | train_acc 50.40% | test_acc 50.17%
+epoch 011/60 | loss 1.3706 | train_acc 50.28% | test_acc 52.08%
+epoch 012/60 | loss 1.3344 | train_acc 51.59% | test_acc 50.03%
+epoch 013/60 | loss 1.3602 | train_acc 50.52% | test_acc 53.11%
+epoch 014/60 | loss 1.3095 | train_acc 52.41% | test_acc 54.43%
+epoch 015/60 | loss 1.2987 | train_acc 52.86% | test_acc 54.14%
+epoch 016/60 | loss 1.3024 | train_acc 52.67% | test_acc 53.77%
+epoch 017/60 | loss 1.2974 | train_acc 52.98% | test_acc 55.65%
+epoch 018/60 | loss 1.2831 | train_acc 53.60% | test_acc 54.34%
+epoch 019/60 | loss 1.2580 | train_acc 54.32% | test_acc 56.54%
+epoch 020/60 | loss 1.2099 | train_acc 56.35% | test_acc 57.79%
+epoch 021/60 | loss 1.1928 | train_acc 57.09% | test_acc 58.76%
+epoch 022/60 | loss 1.1754 | train_acc 57.69% | test_acc 58.41%
+epoch 023/60 | loss 1.1499 | train_acc 58.46% | test_acc 57.86%
+epoch 024/60 | loss 1.1640 | train_acc 58.20% | test_acc 60.28%
+epoch 025/60 | loss 1.1434 | train_acc 58.57% | test_acc 61.16%
+epoch 026/60 | loss 1.1118 | train_acc 59.99% | test_acc 59.78%
+epoch 027/60 | loss 1.1036 | train_acc 60.25% | test_acc 62.50%
+epoch 028/60 | loss 1.0941 | train_acc 60.72% | test_acc 62.74%
+epoch 029/60 | loss 1.0658 | train_acc 61.69% | test_acc 62.48%
+epoch 030/60 | loss 1.0334 | train_acc 63.09% | test_acc 64.60%
+epoch 031/60 | loss 1.0235 | train_acc 63.15% | test_acc 64.77%
+epoch 032/60 | loss 1.0050 | train_acc 63.99% | test_acc 64.71%
+epoch 033/60 | loss 0.9800 | train_acc 64.79% | test_acc 65.42%
+epoch 034/60 | loss 0.9535 | train_acc 65.76% | test_acc 66.13%
+epoch 035/60 | loss 0.9406 | train_acc 66.28% | test_acc 66.63%
+epoch 036/60 | loss 0.9090 | train_acc 67.65% | test_acc 66.85%
+epoch 037/60 | loss 0.8909 | train_acc 68.32% | test_acc 68.47%
+epoch 038/60 | loss 0.8651 | train_acc 69.15% | test_acc 69.75%
+epoch 039/60 | loss 0.8426 | train_acc 69.87% | test_acc 70.14%
+epoch 040/60 | loss 0.8358 | train_acc 70.09% | test_acc 70.57%
+epoch 041/60 | loss 0.8056 | train_acc 71.16% | test_acc 70.50%
+epoch 042/60 | loss 0.7891 | train_acc 72.01% | test_acc 71.91%
+epoch 043/60 | loss 0.7718 | train_acc 72.57% | test_acc 72.10%
+epoch 044/60 | loss 0.7521 | train_acc 73.36% | test_acc 72.97%
+epoch 045/60 | loss 0.7306 | train_acc 73.96% | test_acc 73.52%
+epoch 046/60 | loss 0.7106 | train_acc 74.58% | test_acc 73.57%
+epoch 047/60 | loss 0.6973 | train_acc 75.20% | test_acc 73.98%
+epoch 048/60 | loss 0.6791 | train_acc 75.71% | test_acc 73.99%
+epoch 049/60 | loss 0.6677 | train_acc 76.08% | test_acc 74.49%
+epoch 050/60 | loss 0.6569 | train_acc 76.53% | test_acc 74.74%
+epoch 051/60 | loss 0.6451 | train_acc 77.05% | test_acc 75.09%
+epoch 052/60 | loss 0.6304 | train_acc 77.51% | test_acc 75.32%
+epoch 053/60 | loss 0.6205 | train_acc 77.79% | test_acc 75.46%
+epoch 054/60 | loss 0.6114 | train_acc 78.19% | test_acc 75.63%
+epoch 055/60 | loss 0.6006 | train_acc 78.71% | test_acc 75.86%
+epoch 056/60 | loss 0.5951 | train_acc 78.66% | test_acc 76.06%
+epoch 057/60 | loss 0.5901 | train_acc 78.86% | test_acc 75.96%
+epoch 058/60 | loss 0.5794 | train_acc 79.39% | test_acc 76.06%
+epoch 059/60 | loss 0.5829 | train_acc 79.26% | test_acc 76.11%
+epoch 060/60 | loss 0.5837 | train_acc 79.18% | test_acc 76.10%
+
+================================================================
+run 69/81 | lr=0.001 wd=0.07 bs=256 drop_path_rate=0.2
+================================================================
+epoch 001/60 | loss 2.0995 | train_acc 22.17% | test_acc 26.27%
+epoch 002/60 | loss 1.8072 | train_acc 32.11% | test_acc 38.88%
+epoch 003/60 | loss 1.5410 | train_acc 43.35% | test_acc 47.50%
+epoch 004/60 | loss 1.4015 | train_acc 48.95% | test_acc 51.61%
+epoch 005/60 | loss 1.3555 | train_acc 50.57% | test_acc 51.31%
+epoch 006/60 | loss 1.4001 | train_acc 48.75% | test_acc 48.66%
+epoch 007/60 | loss 1.4061 | train_acc 48.83% | test_acc 49.27%
+epoch 008/60 | loss 1.4029 | train_acc 49.00% | test_acc 50.31%
+epoch 009/60 | loss 1.3902 | train_acc 49.32% | test_acc 50.25%
+epoch 010/60 | loss 1.3602 | train_acc 50.63% | test_acc 51.00%
+epoch 011/60 | loss 1.3815 | train_acc 49.66% | test_acc 52.22%
+epoch 012/60 | loss 1.3831 | train_acc 50.08% | test_acc 52.57%
+epoch 013/60 | loss 1.3264 | train_acc 52.00% | test_acc 54.06%
+epoch 014/60 | loss 1.2897 | train_acc 53.26% | test_acc 54.69%
+epoch 015/60 | loss 1.2671 | train_acc 54.10% | test_acc 53.18%
+epoch 016/60 | loss 1.2551 | train_acc 54.60% | test_acc 56.07%
+epoch 017/60 | loss 1.2220 | train_acc 55.49% | test_acc 56.66%
+epoch 018/60 | loss 1.2220 | train_acc 55.75% | test_acc 55.73%
+epoch 019/60 | loss 1.2096 | train_acc 56.36% | test_acc 58.10%
+epoch 020/60 | loss 1.2095 | train_acc 56.31% | test_acc 55.48%
+epoch 021/60 | loss 1.2139 | train_acc 56.10% | test_acc 57.60%
+epoch 022/60 | loss 1.1699 | train_acc 57.46% | test_acc 57.90%
+epoch 023/60 | loss 1.1552 | train_acc 58.14% | test_acc 60.03%
+epoch 024/60 | loss 1.1385 | train_acc 59.23% | test_acc 59.38%
+epoch 025/60 | loss 1.1410 | train_acc 58.93% | test_acc 60.49%
+epoch 026/60 | loss 1.0982 | train_acc 60.56% | test_acc 60.91%
+epoch 027/60 | loss 1.0725 | train_acc 61.23% | test_acc 63.04%
+epoch 028/60 | loss 1.0700 | train_acc 61.39% | test_acc 61.68%
+epoch 029/60 | loss 1.0402 | train_acc 62.61% | test_acc 63.15%
+epoch 030/60 | loss 1.0115 | train_acc 63.58% | test_acc 64.93%
+epoch 031/60 | loss 0.9889 | train_acc 64.40% | test_acc 64.85%
+epoch 032/60 | loss 0.9761 | train_acc 65.04% | test_acc 65.06%
+epoch 033/60 | loss 0.9497 | train_acc 65.76% | test_acc 66.99%
+epoch 034/60 | loss 0.9214 | train_acc 66.93% | test_acc 66.46%
+epoch 035/60 | loss 0.9071 | train_acc 67.38% | test_acc 67.42%
+epoch 036/60 | loss 0.8840 | train_acc 68.22% | test_acc 67.80%
+epoch 037/60 | loss 0.8625 | train_acc 69.26% | test_acc 68.77%
+epoch 038/60 | loss 0.8397 | train_acc 70.09% | test_acc 70.36%
+epoch 039/60 | loss 0.8215 | train_acc 70.64% | test_acc 70.74%
+epoch 040/60 | loss 0.8027 | train_acc 71.37% | test_acc 70.71%
+epoch 041/60 | loss 0.7802 | train_acc 72.37% | test_acc 71.88%
+epoch 042/60 | loss 0.7616 | train_acc 72.95% | test_acc 71.46%
+epoch 043/60 | loss 0.7410 | train_acc 73.59% | test_acc 72.94%
+epoch 044/60 | loss 0.7228 | train_acc 74.21% | test_acc 73.34%
+epoch 045/60 | loss 0.7035 | train_acc 75.07% | test_acc 73.48%
+epoch 046/60 | loss 0.6885 | train_acc 75.61% | test_acc 73.18%
+epoch 047/60 | loss 0.6668 | train_acc 76.21% | test_acc 74.70%
+epoch 048/60 | loss 0.6481 | train_acc 76.95% | test_acc 75.09%
+epoch 049/60 | loss 0.6352 | train_acc 77.55% | test_acc 75.19%
+epoch 050/60 | loss 0.6168 | train_acc 78.00% | test_acc 75.32%
+epoch 051/60 | loss 0.6026 | train_acc 78.51% | test_acc 75.61%
+epoch 052/60 | loss 0.5919 | train_acc 78.95% | test_acc 76.43%
+epoch 053/60 | loss 0.5790 | train_acc 79.57% | test_acc 76.06%
+epoch 054/60 | loss 0.5666 | train_acc 79.80% | test_acc 75.95%
+epoch 055/60 | loss 0.5629 | train_acc 79.82% | test_acc 76.58%
+epoch 056/60 | loss 0.5550 | train_acc 80.25% | test_acc 76.88%
+epoch 057/60 | loss 0.5478 | train_acc 80.43% | test_acc 76.77%
+epoch 058/60 | loss 0.5424 | train_acc 80.47% | test_acc 76.83%
+epoch 059/60 | loss 0.5384 | train_acc 80.79% | test_acc 76.78%
+epoch 060/60 | loss 0.5337 | train_acc 80.92% | test_acc 76.93%
+
+================================================================
+run 70/81 | lr=0.001 wd=0.07 bs=512 drop_path_rate=0.0
+================================================================
+epoch 001/60 | loss 2.0653 | train_acc 23.04% | test_acc 26.23%
+epoch 002/60 | loss 1.8404 | train_acc 31.59% | test_acc 38.19%
+epoch 003/60 | loss 1.5836 | train_acc 41.63% | test_acc 45.10%
+epoch 004/60 | loss 1.4287 | train_acc 48.04% | test_acc 50.08%
+epoch 005/60 | loss 1.3046 | train_acc 52.56% | test_acc 53.30%
+epoch 006/60 | loss 1.2744 | train_acc 53.75% | test_acc 57.84%
+epoch 007/60 | loss 1.2147 | train_acc 56.17% | test_acc 57.35%
+epoch 008/60 | loss 1.1828 | train_acc 57.21% | test_acc 58.38%
+epoch 009/60 | loss 1.1641 | train_acc 58.06% | test_acc 59.12%
+epoch 010/60 | loss 1.1335 | train_acc 59.42% | test_acc 60.07%
+epoch 011/60 | loss 1.1192 | train_acc 59.75% | test_acc 61.33%
+epoch 012/60 | loss 1.0985 | train_acc 60.61% | test_acc 62.55%
+epoch 013/60 | loss 1.0902 | train_acc 60.85% | test_acc 62.95%
+epoch 014/60 | loss 1.0593 | train_acc 61.92% | test_acc 64.04%
+epoch 015/60 | loss 1.0434 | train_acc 62.70% | test_acc 63.05%
+epoch 016/60 | loss 1.0267 | train_acc 63.13% | test_acc 65.02%
+epoch 017/60 | loss 0.9919 | train_acc 64.60% | test_acc 64.38%
+epoch 018/60 | loss 0.9675 | train_acc 65.30% | test_acc 67.22%
+epoch 019/60 | loss 0.9436 | train_acc 66.43% | test_acc 67.01%
+epoch 020/60 | loss 0.9188 | train_acc 67.26% | test_acc 66.58%
+epoch 021/60 | loss 0.8902 | train_acc 68.51% | test_acc 68.14%
+epoch 022/60 | loss 0.8835 | train_acc 68.46% | test_acc 68.90%
+epoch 023/60 | loss 0.8567 | train_acc 69.55% | test_acc 70.28%
+epoch 024/60 | loss 0.8343 | train_acc 70.45% | test_acc 70.10%
+epoch 025/60 | loss 0.8126 | train_acc 71.15% | test_acc 70.59%
+epoch 026/60 | loss 0.8021 | train_acc 71.40% | test_acc 71.49%
+epoch 027/60 | loss 0.7801 | train_acc 71.95% | test_acc 71.55%
+epoch 028/60 | loss 0.7538 | train_acc 72.91% | test_acc 72.35%
+epoch 029/60 | loss 0.7317 | train_acc 73.97% | test_acc 73.25%
+epoch 030/60 | loss 0.7052 | train_acc 74.82% | test_acc 73.58%
+epoch 031/60 | loss 0.6806 | train_acc 75.71% | test_acc 74.79%
+epoch 032/60 | loss 0.6545 | train_acc 76.83% | test_acc 75.02%
+epoch 033/60 | loss 0.6364 | train_acc 77.29% | test_acc 76.15%
+epoch 034/60 | loss 0.6128 | train_acc 78.32% | test_acc 76.11%
+epoch 035/60 | loss 0.5943 | train_acc 78.73% | test_acc 77.13%
+epoch 036/60 | loss 0.5728 | train_acc 79.54% | test_acc 77.38%
+epoch 037/60 | loss 0.5505 | train_acc 80.41% | test_acc 77.82%
+epoch 038/60 | loss 0.5324 | train_acc 80.97% | test_acc 77.34%
+epoch 039/60 | loss 0.5070 | train_acc 81.96% | test_acc 78.62%
+epoch 040/60 | loss 0.4930 | train_acc 82.47% | test_acc 78.78%
+epoch 041/60 | loss 0.4709 | train_acc 83.47% | test_acc 79.16%
+epoch 042/60 | loss 0.4502 | train_acc 83.98% | test_acc 79.65%
+epoch 043/60 | loss 0.4267 | train_acc 84.79% | test_acc 79.71%
+epoch 044/60 | loss 0.4034 | train_acc 85.69% | test_acc 79.79%
+epoch 045/60 | loss 0.3841 | train_acc 86.26% | test_acc 79.96%
+epoch 046/60 | loss 0.3667 | train_acc 87.07% | test_acc 80.45%
+epoch 047/60 | loss 0.3473 | train_acc 87.54% | test_acc 80.81%
+epoch 048/60 | loss 0.3266 | train_acc 88.27% | test_acc 80.36%
+epoch 049/60 | loss 0.3105 | train_acc 88.98% | test_acc 81.10%
+epoch 050/60 | loss 0.2862 | train_acc 89.86% | test_acc 81.10%
+epoch 051/60 | loss 0.2822 | train_acc 89.91% | test_acc 81.33%
+epoch 052/60 | loss 0.2631 | train_acc 90.61% | test_acc 81.15%
+epoch 053/60 | loss 0.2490 | train_acc 91.03% | test_acc 81.18%
+epoch 054/60 | loss 0.2356 | train_acc 91.55% | test_acc 81.43%
+epoch 055/60 | loss 0.2277 | train_acc 91.92% | test_acc 81.22%
+epoch 056/60 | loss 0.2174 | train_acc 92.26% | test_acc 81.41%
+epoch 057/60 | loss 0.2129 | train_acc 92.35% | test_acc 81.40%
+epoch 058/60 | loss 0.2112 | train_acc 92.46% | test_acc 81.55%
+epoch 059/60 | loss 0.1987 | train_acc 92.96% | test_acc 81.53%
+epoch 060/60 | loss 0.2004 | train_acc 92.95% | test_acc 81.41%
+
+================================================================
+run 71/81 | lr=0.001 wd=0.07 bs=512 drop_path_rate=0.1
+================================================================
+epoch 001/60 | loss 2.0730 | train_acc 23.87% | test_acc 27.18%
+epoch 002/60 | loss 1.8279 | train_acc 31.32% | test_acc 36.72%
+epoch 003/60 | loss 1.5871 | train_acc 41.40% | test_acc 46.10%
+epoch 004/60 | loss 1.4321 | train_acc 47.81% | test_acc 51.32%
+epoch 005/60 | loss 1.3295 | train_acc 51.84% | test_acc 56.23%
+epoch 006/60 | loss 1.2793 | train_acc 53.60% | test_acc 55.46%
+epoch 007/60 | loss 1.2255 | train_acc 55.76% | test_acc 57.25%
+epoch 008/60 | loss 1.1987 | train_acc 56.87% | test_acc 56.35%
+epoch 009/60 | loss 1.1934 | train_acc 56.89% | test_acc 59.01%
+epoch 010/60 | loss 1.1764 | train_acc 57.53% | test_acc 59.40%
+epoch 011/60 | loss 1.1492 | train_acc 58.49% | test_acc 59.34%
+epoch 012/60 | loss 1.1540 | train_acc 58.41% | test_acc 61.43%
+epoch 013/60 | loss 1.1337 | train_acc 59.13% | test_acc 60.52%
+epoch 014/60 | loss 1.1460 | train_acc 58.63% | test_acc 59.76%
+epoch 015/60 | loss 1.1350 | train_acc 59.07% | test_acc 60.99%
+epoch 016/60 | loss 1.1269 | train_acc 59.52% | test_acc 60.00%
+epoch 017/60 | loss 1.1211 | train_acc 59.43% | test_acc 60.97%
+epoch 018/60 | loss 1.0791 | train_acc 61.30% | test_acc 62.60%
+epoch 019/60 | loss 1.0879 | train_acc 60.76% | test_acc 63.55%
+epoch 020/60 | loss 1.0449 | train_acc 62.61% | test_acc 64.05%
+epoch 021/60 | loss 1.0468 | train_acc 62.60% | test_acc 61.63%
+epoch 022/60 | loss 1.0259 | train_acc 63.35% | test_acc 63.16%
+epoch 023/60 | loss 0.9976 | train_acc 64.31% | test_acc 64.25%
+epoch 024/60 | loss 0.9858 | train_acc 64.78% | test_acc 66.33%
+epoch 025/60 | loss 0.9541 | train_acc 65.91% | test_acc 68.09%
+epoch 026/60 | loss 0.9351 | train_acc 66.61% | test_acc 68.34%
+epoch 027/60 | loss 0.9078 | train_acc 67.59% | test_acc 68.01%
+epoch 028/60 | loss 0.8897 | train_acc 68.23% | test_acc 68.96%
+epoch 029/60 | loss 0.8702 | train_acc 69.10% | test_acc 70.19%
+epoch 030/60 | loss 0.8539 | train_acc 69.67% | test_acc 70.94%
+epoch 031/60 | loss 0.8360 | train_acc 70.32% | test_acc 70.37%
+epoch 032/60 | loss 0.8215 | train_acc 70.73% | test_acc 70.86%
+epoch 033/60 | loss 0.7932 | train_acc 71.67% | test_acc 71.80%
+epoch 034/60 | loss 0.7815 | train_acc 72.15% | test_acc 72.23%
+epoch 035/60 | loss 0.7648 | train_acc 72.75% | test_acc 73.03%
+epoch 036/60 | loss 0.7453 | train_acc 73.49% | test_acc 73.53%
+epoch 037/60 | loss 0.7211 | train_acc 74.39% | test_acc 73.54%
+epoch 038/60 | loss 0.7093 | train_acc 74.79% | test_acc 74.18%
+epoch 039/60 | loss 0.6849 | train_acc 75.51% | test_acc 74.42%
+epoch 040/60 | loss 0.6735 | train_acc 75.99% | test_acc 75.18%
+epoch 041/60 | loss 0.6563 | train_acc 76.49% | test_acc 75.95%
+epoch 042/60 | loss 0.6330 | train_acc 77.56% | test_acc 76.38%
+epoch 043/60 | loss 0.6150 | train_acc 78.22% | test_acc 76.46%
+epoch 044/60 | loss 0.6043 | train_acc 78.38% | test_acc 76.89%
+epoch 045/60 | loss 0.5827 | train_acc 79.32% | test_acc 77.04%
+epoch 046/60 | loss 0.5649 | train_acc 79.94% | test_acc 77.05%
+epoch 047/60 | loss 0.5476 | train_acc 80.59% | test_acc 77.70%
+epoch 048/60 | loss 0.5348 | train_acc 80.91% | test_acc 77.69%
+epoch 049/60 | loss 0.5234 | train_acc 81.42% | test_acc 78.47%
+epoch 050/60 | loss 0.5072 | train_acc 82.04% | test_acc 78.97%
+epoch 051/60 | loss 0.4976 | train_acc 82.32% | test_acc 78.80%
+epoch 052/60 | loss 0.4896 | train_acc 82.59% | test_acc 78.90%
+epoch 053/60 | loss 0.4794 | train_acc 83.02% | test_acc 78.83%
+epoch 054/60 | loss 0.4686 | train_acc 83.47% | test_acc 79.10%
+epoch 055/60 | loss 0.4602 | train_acc 83.53% | test_acc 79.25%
+epoch 056/60 | loss 0.4567 | train_acc 83.68% | test_acc 79.10%
+epoch 057/60 | loss 0.4470 | train_acc 84.20% | test_acc 79.41%
+epoch 058/60 | loss 0.4466 | train_acc 84.12% | test_acc 79.52%
+epoch 059/60 | loss 0.4425 | train_acc 84.25% | test_acc 79.65%
+epoch 060/60 | loss 0.4401 | train_acc 84.26% | test_acc 79.34%
+
+================================================================
+run 72/81 | lr=0.001 wd=0.07 bs=512 drop_path_rate=0.2
+================================================================
+epoch 001/60 | loss 2.0740 | train_acc 22.51% | test_acc 26.33%
+epoch 002/60 | loss 1.8425 | train_acc 30.56% | test_acc 35.44%
+epoch 003/60 | loss 1.6346 | train_acc 39.23% | test_acc 46.61%
+epoch 004/60 | loss 1.4424 | train_acc 47.34% | test_acc 50.72%
+epoch 005/60 | loss 1.3351 | train_acc 51.38% | test_acc 54.62%
+epoch 006/60 | loss 1.3039 | train_acc 52.69% | test_acc 54.87%
+epoch 007/60 | loss 1.2473 | train_acc 54.95% | test_acc 55.82%
+epoch 008/60 | loss 1.2316 | train_acc 55.43% | test_acc 55.53%
+epoch 009/60 | loss 1.2037 | train_acc 56.54% | test_acc 58.84%
+epoch 010/60 | loss 1.1834 | train_acc 57.25% | test_acc 58.84%
+epoch 011/60 | loss 1.1797 | train_acc 57.38% | test_acc 59.23%
+epoch 012/60 | loss 1.1730 | train_acc 57.74% | test_acc 59.79%
+epoch 013/60 | loss 1.1767 | train_acc 57.60% | test_acc 58.23%
+epoch 014/60 | loss 1.1598 | train_acc 58.14% | test_acc 58.63%
+epoch 015/60 | loss 1.1736 | train_acc 57.90% | test_acc 59.23%
+epoch 016/60 | loss 1.1654 | train_acc 58.09% | test_acc 59.61%
+epoch 017/60 | loss 1.1482 | train_acc 58.65% | test_acc 60.16%
+epoch 018/60 | loss 1.1264 | train_acc 59.25% | test_acc 61.53%
+epoch 019/60 | loss 1.1095 | train_acc 60.23% | test_acc 62.07%
+epoch 020/60 | loss 1.0793 | train_acc 61.47% | test_acc 63.49%
+epoch 021/60 | loss 1.0450 | train_acc 62.59% | test_acc 64.36%
+epoch 022/60 | loss 1.0181 | train_acc 63.51% | test_acc 65.25%
+epoch 023/60 | loss 1.0134 | train_acc 63.76% | test_acc 64.81%
+epoch 024/60 | loss 1.0028 | train_acc 63.91% | test_acc 65.44%
+epoch 025/60 | loss 0.9739 | train_acc 65.26% | test_acc 66.54%
+epoch 026/60 | loss 0.9761 | train_acc 65.23% | test_acc 66.94%
+epoch 027/60 | loss 0.9487 | train_acc 66.10% | test_acc 66.39%
+epoch 028/60 | loss 0.9346 | train_acc 66.63% | test_acc 67.78%
+epoch 029/60 | loss 0.9171 | train_acc 67.33% | test_acc 69.42%
+epoch 030/60 | loss 0.9055 | train_acc 67.62% | test_acc 68.68%
+epoch 031/60 | loss 0.8797 | train_acc 68.73% | test_acc 68.74%
+epoch 032/60 | loss 0.8573 | train_acc 69.55% | test_acc 68.51%
+epoch 033/60 | loss 0.8483 | train_acc 69.64% | test_acc 71.33%
+epoch 034/60 | loss 0.8125 | train_acc 71.00% | test_acc 72.33%
+epoch 035/60 | loss 0.7915 | train_acc 71.75% | test_acc 72.22%
+epoch 036/60 | loss 0.7837 | train_acc 72.32% | test_acc 72.35%
+epoch 037/60 | loss 0.7628 | train_acc 72.92% | test_acc 72.40%
+epoch 038/60 | loss 0.7471 | train_acc 73.50% | test_acc 73.62%
+epoch 039/60 | loss 0.7292 | train_acc 74.04% | test_acc 74.44%
+epoch 040/60 | loss 0.7049 | train_acc 74.88% | test_acc 74.35%
+epoch 041/60 | loss 0.6920 | train_acc 75.38% | test_acc 74.65%
+epoch 042/60 | loss 0.6700 | train_acc 76.18% | test_acc 75.40%
+epoch 043/60 | loss 0.6565 | train_acc 76.58% | test_acc 75.69%
+epoch 044/60 | loss 0.6412 | train_acc 77.16% | test_acc 76.60%
+epoch 045/60 | loss 0.6204 | train_acc 77.86% | test_acc 76.70%
+epoch 046/60 | loss 0.6099 | train_acc 78.28% | test_acc 76.58%
+epoch 047/60 | loss 0.5985 | train_acc 78.86% | test_acc 77.46%
+epoch 048/60 | loss 0.5799 | train_acc 79.20% | test_acc 77.32%
+epoch 049/60 | loss 0.5668 | train_acc 79.75% | test_acc 77.44%
+epoch 050/60 | loss 0.5624 | train_acc 80.24% | test_acc 77.73%
+epoch 051/60 | loss 0.5522 | train_acc 80.24% | test_acc 78.55%
+epoch 052/60 | loss 0.5344 | train_acc 80.97% | test_acc 78.35%
+epoch 053/60 | loss 0.5286 | train_acc 81.25% | test_acc 78.38%
+epoch 054/60 | loss 0.5216 | train_acc 81.37% | test_acc 78.64%
+epoch 055/60 | loss 0.5111 | train_acc 81.81% | test_acc 79.06%
+epoch 056/60 | loss 0.5083 | train_acc 81.97% | test_acc 78.81%
+epoch 057/60 | loss 0.5027 | train_acc 82.11% | test_acc 79.21%
+epoch 058/60 | loss 0.4965 | train_acc 82.40% | test_acc 79.35%
+epoch 059/60 | loss 0.4951 | train_acc 82.44% | test_acc 79.41%
+epoch 060/60 | loss 0.4950 | train_acc 82.39% | test_acc 79.20%
+
+================================================================
+run 73/81 | lr=0.001 wd=0.15 bs=128 drop_path_rate=0.0
+================================================================
+epoch 001/60 | loss 2.0769 | train_acc 23.55% | test_acc 26.26%
+epoch 002/60 | loss 1.7502 | train_acc 34.83% | test_acc 41.54%
+epoch 003/60 | loss 1.4891 | train_acc 45.04% | test_acc 48.74%
+epoch 004/60 | loss 1.3929 | train_acc 49.37% | test_acc 53.58%
+epoch 005/60 | loss 1.4047 | train_acc 48.88% | test_acc 51.26%
+epoch 006/60 | loss 1.4401 | train_acc 47.15% | test_acc 49.42%
+epoch 007/60 | loss 1.4147 | train_acc 48.82% | test_acc 51.33%
+epoch 008/60 | loss 1.3590 | train_acc 50.55% | test_acc 51.26%
+epoch 009/60 | loss 1.3242 | train_acc 51.91% | test_acc 52.54%
+epoch 010/60 | loss 1.2881 | train_acc 53.24% | test_acc 55.68%
+epoch 011/60 | loss 1.2373 | train_acc 54.98% | test_acc 57.47%
+epoch 012/60 | loss 1.1893 | train_acc 57.19% | test_acc 58.60%
+epoch 013/60 | loss 1.1533 | train_acc 58.21% | test_acc 59.81%
+epoch 014/60 | loss 1.0948 | train_acc 60.73% | test_acc 60.07%
+epoch 015/60 | loss 1.0460 | train_acc 62.60% | test_acc 65.74%
+epoch 016/60 | loss 0.9933 | train_acc 64.52% | test_acc 65.42%
+epoch 017/60 | loss 0.9350 | train_acc 66.42% | test_acc 67.20%
+epoch 018/60 | loss 0.8892 | train_acc 68.29% | test_acc 69.35%
+epoch 019/60 | loss 0.8531 | train_acc 69.81% | test_acc 70.64%
+epoch 020/60 | loss 0.8104 | train_acc 71.33% | test_acc 71.08%
+epoch 021/60 | loss 0.7802 | train_acc 72.59% | test_acc 72.28%
+epoch 022/60 | loss 0.7516 | train_acc 73.52% | test_acc 72.91%
+epoch 023/60 | loss 0.7253 | train_acc 74.40% | test_acc 72.47%
+epoch 024/60 | loss 0.6849 | train_acc 76.02% | test_acc 73.30%
+epoch 025/60 | loss 0.6590 | train_acc 76.65% | test_acc 76.08%
+epoch 026/60 | loss 0.6389 | train_acc 77.49% | test_acc 76.04%
+epoch 027/60 | loss 0.6174 | train_acc 78.07% | test_acc 76.49%
+epoch 028/60 | loss 0.5926 | train_acc 79.04% | test_acc 77.03%
+epoch 029/60 | loss 0.5683 | train_acc 79.97% | test_acc 78.81%
+epoch 030/60 | loss 0.5443 | train_acc 80.96% | test_acc 77.67%
+epoch 031/60 | loss 0.5251 | train_acc 81.41% | test_acc 78.93%
+epoch 032/60 | loss 0.5042 | train_acc 82.15% | test_acc 78.23%
+epoch 033/60 | loss 0.4852 | train_acc 82.77% | test_acc 79.36%
+epoch 034/60 | loss 0.4567 | train_acc 83.66% | test_acc 79.70%
+epoch 035/60 | loss 0.4344 | train_acc 84.66% | test_acc 79.69%
+epoch 036/60 | loss 0.4137 | train_acc 85.28% | test_acc 79.53%
+epoch 037/60 | loss 0.3910 | train_acc 85.93% | test_acc 80.56%
+epoch 038/60 | loss 0.3720 | train_acc 86.75% | test_acc 80.74%
+epoch 039/60 | loss 0.3470 | train_acc 87.45% | test_acc 80.92%
+epoch 040/60 | loss 0.3225 | train_acc 88.55% | test_acc 81.24%
+epoch 041/60 | loss 0.3031 | train_acc 89.15% | test_acc 80.80%
+epoch 042/60 | loss 0.2774 | train_acc 90.13% | test_acc 81.13%
+epoch 043/60 | loss 0.2557 | train_acc 90.89% | test_acc 80.86%
+epoch 044/60 | loss 0.2368 | train_acc 91.67% | test_acc 81.58%
+epoch 045/60 | loss 0.2167 | train_acc 92.36% | test_acc 81.92%
+epoch 046/60 | loss 0.1890 | train_acc 93.41% | test_acc 81.82%
+epoch 047/60 | loss 0.1769 | train_acc 93.75% | test_acc 81.74%
+epoch 048/60 | loss 0.1604 | train_acc 94.27% | test_acc 81.64%
+epoch 049/60 | loss 0.1467 | train_acc 94.79% | test_acc 82.24%
+epoch 050/60 | loss 0.1261 | train_acc 95.64% | test_acc 82.07%
+epoch 051/60 | loss 0.1131 | train_acc 95.99% | test_acc 82.21%
+epoch 052/60 | loss 0.1021 | train_acc 96.47% | test_acc 82.20%
+epoch 053/60 | loss 0.0905 | train_acc 96.94% | test_acc 82.46%
+epoch 054/60 | loss 0.0845 | train_acc 97.09% | test_acc 82.03%
+epoch 055/60 | loss 0.0721 | train_acc 97.61% | test_acc 82.60%
+epoch 056/60 | loss 0.0691 | train_acc 97.62% | test_acc 82.29%
+epoch 057/60 | loss 0.0651 | train_acc 97.83% | test_acc 82.59%
+epoch 058/60 | loss 0.0603 | train_acc 97.91% | test_acc 82.55%
+epoch 059/60 | loss 0.0572 | train_acc 98.10% | test_acc 82.66%
+epoch 060/60 | loss 0.0545 | train_acc 98.20% | test_acc 82.60%
+
+================================================================
+run 74/81 | lr=0.001 wd=0.15 bs=128 drop_path_rate=0.1
+================================================================
+epoch 001/60 | loss 2.1013 | train_acc 21.89% | test_acc 26.06%
+epoch 002/60 | loss 1.7454 | train_acc 34.27% | test_acc 43.60%
+epoch 003/60 | loss 1.4831 | train_acc 45.62% | test_acc 51.20%
+epoch 004/60 | loss 1.3958 | train_acc 49.29% | test_acc 51.03%
+epoch 005/60 | loss 1.4041 | train_acc 49.08% | test_acc 53.08%
+epoch 006/60 | loss 1.4401 | train_acc 47.52% | test_acc 49.35%
+epoch 007/60 | loss 1.4058 | train_acc 48.90% | test_acc 52.02%
+epoch 008/60 | loss 1.3344 | train_acc 51.50% | test_acc 54.07%
+epoch 009/60 | loss 1.2857 | train_acc 53.26% | test_acc 55.87%
+epoch 010/60 | loss 1.2547 | train_acc 54.55% | test_acc 57.48%
+epoch 011/60 | loss 1.2077 | train_acc 56.42% | test_acc 57.95%
+epoch 012/60 | loss 1.1615 | train_acc 58.00% | test_acc 60.16%
+epoch 013/60 | loss 1.1066 | train_acc 60.42% | test_acc 60.21%
+epoch 014/60 | loss 1.0623 | train_acc 61.83% | test_acc 64.33%
+epoch 015/60 | loss 1.0154 | train_acc 63.68% | test_acc 66.59%
+epoch 016/60 | loss 0.9548 | train_acc 66.09% | test_acc 66.68%
+epoch 017/60 | loss 0.9123 | train_acc 67.54% | test_acc 68.49%
+epoch 018/60 | loss 0.8743 | train_acc 69.12% | test_acc 70.71%
+epoch 019/60 | loss 0.8344 | train_acc 70.40% | test_acc 70.70%
+epoch 020/60 | loss 0.8076 | train_acc 71.35% | test_acc 72.62%
+epoch 021/60 | loss 0.7749 | train_acc 72.73% | test_acc 70.78%
+epoch 022/60 | loss 0.7459 | train_acc 73.64% | test_acc 75.14%
+epoch 023/60 | loss 0.7263 | train_acc 74.25% | test_acc 74.27%
+epoch 024/60 | loss 0.7035 | train_acc 75.14% | test_acc 76.11%
+epoch 025/60 | loss 0.6777 | train_acc 76.16% | test_acc 76.30%
+epoch 026/60 | loss 0.6499 | train_acc 76.99% | test_acc 75.96%
+epoch 027/60 | loss 0.6277 | train_acc 77.81% | test_acc 76.88%
+epoch 028/60 | loss 0.6128 | train_acc 78.19% | test_acc 77.29%
+epoch 029/60 | loss 0.5832 | train_acc 79.53% | test_acc 78.71%
+epoch 030/60 | loss 0.5675 | train_acc 79.91% | test_acc 78.40%
+epoch 031/60 | loss 0.5465 | train_acc 80.72% | test_acc 79.07%
+epoch 032/60 | loss 0.5260 | train_acc 81.41% | test_acc 79.68%
+epoch 033/60 | loss 0.5064 | train_acc 82.17% | test_acc 79.70%
+epoch 034/60 | loss 0.4817 | train_acc 82.89% | test_acc 79.34%
+epoch 035/60 | loss 0.4690 | train_acc 83.28% | test_acc 80.54%
+epoch 036/60 | loss 0.4418 | train_acc 84.47% | test_acc 80.29%
+epoch 037/60 | loss 0.4241 | train_acc 84.89% | test_acc 80.36%
+epoch 038/60 | loss 0.4019 | train_acc 85.67% | test_acc 80.84%
+epoch 039/60 | loss 0.3833 | train_acc 86.32% | test_acc 81.41%
+epoch 040/60 | loss 0.3671 | train_acc 86.88% | test_acc 81.66%
+epoch 041/60 | loss 0.3420 | train_acc 87.78% | test_acc 81.98%
+epoch 042/60 | loss 0.3258 | train_acc 88.53% | test_acc 82.09%
+epoch 043/60 | loss 0.3023 | train_acc 89.11% | test_acc 81.41%
+epoch 044/60 | loss 0.2792 | train_acc 90.03% | test_acc 81.80%
+epoch 045/60 | loss 0.2677 | train_acc 90.53% | test_acc 81.96%
+epoch 046/60 | loss 0.2460 | train_acc 91.26% | test_acc 81.88%
+epoch 047/60 | loss 0.2238 | train_acc 92.03% | test_acc 82.45%
+epoch 048/60 | loss 0.2053 | train_acc 92.62% | test_acc 82.73%
+epoch 049/60 | loss 0.1926 | train_acc 93.08% | test_acc 82.92%
+epoch 050/60 | loss 0.1764 | train_acc 93.65% | test_acc 82.49%
+epoch 051/60 | loss 0.1628 | train_acc 94.25% | test_acc 82.58%
+epoch 052/60 | loss 0.1474 | train_acc 94.87% | test_acc 83.24%
+epoch 053/60 | loss 0.1420 | train_acc 95.09% | test_acc 83.44%
+epoch 054/60 | loss 0.1284 | train_acc 95.52% | test_acc 83.55%
+epoch 055/60 | loss 0.1259 | train_acc 95.58% | test_acc 83.43%
+epoch 056/60 | loss 0.1174 | train_acc 95.94% | test_acc 83.23%
+epoch 057/60 | loss 0.1143 | train_acc 96.08% | test_acc 83.39%
+epoch 058/60 | loss 0.1058 | train_acc 96.31% | test_acc 83.23%
+epoch 059/60 | loss 0.1046 | train_acc 96.43% | test_acc 83.44%
+epoch 060/60 | loss 0.1024 | train_acc 96.51% | test_acc 83.33%
+
+================================================================
+run 75/81 | lr=0.001 wd=0.15 bs=128 drop_path_rate=0.2
+================================================================
+epoch 001/60 | loss 2.1085 | train_acc 21.16% | test_acc 26.37%
+epoch 002/60 | loss 1.7833 | train_acc 33.14% | test_acc 41.70%
+epoch 003/60 | loss 1.4970 | train_acc 45.18% | test_acc 50.93%
+epoch 004/60 | loss 1.4080 | train_acc 48.78% | test_acc 52.39%
+epoch 005/60 | loss 1.4265 | train_acc 48.16% | test_acc 50.31%
+epoch 006/60 | loss 1.4298 | train_acc 47.86% | test_acc 49.71%
+epoch 007/60 | loss 1.3959 | train_acc 49.36% | test_acc 52.17%
+epoch 008/60 | loss 1.3612 | train_acc 50.49% | test_acc 53.97%
+epoch 009/60 | loss 1.3098 | train_acc 52.14% | test_acc 55.37%
+epoch 010/60 | loss 1.2734 | train_acc 53.93% | test_acc 57.27%
+epoch 011/60 | loss 1.2319 | train_acc 55.24% | test_acc 58.80%
+epoch 012/60 | loss 1.1826 | train_acc 57.46% | test_acc 58.40%
+epoch 013/60 | loss 1.1403 | train_acc 58.99% | test_acc 60.79%
+epoch 014/60 | loss 1.1039 | train_acc 60.38% | test_acc 63.10%
+epoch 015/60 | loss 1.0548 | train_acc 62.41% | test_acc 62.61%
+epoch 016/60 | loss 0.9942 | train_acc 64.39% | test_acc 65.24%
+epoch 017/60 | loss 0.9649 | train_acc 65.64% | test_acc 67.57%
+epoch 018/60 | loss 0.9237 | train_acc 67.21% | test_acc 69.57%
+epoch 019/60 | loss 0.8756 | train_acc 68.98% | test_acc 71.26%
+epoch 020/60 | loss 0.8379 | train_acc 70.41% | test_acc 69.93%
+epoch 021/60 | loss 0.8152 | train_acc 71.16% | test_acc 73.02%
+epoch 022/60 | loss 0.7823 | train_acc 72.50% | test_acc 73.69%
+epoch 023/60 | loss 0.7519 | train_acc 73.52% | test_acc 73.98%
+epoch 024/60 | loss 0.7301 | train_acc 74.15% | test_acc 74.26%
+epoch 025/60 | loss 0.7008 | train_acc 75.41% | test_acc 74.92%
+epoch 026/60 | loss 0.6873 | train_acc 75.84% | test_acc 76.12%
+epoch 027/60 | loss 0.6646 | train_acc 76.68% | test_acc 76.58%
+epoch 028/60 | loss 0.6414 | train_acc 77.35% | test_acc 76.51%
+epoch 029/60 | loss 0.6274 | train_acc 77.96% | test_acc 77.52%
+epoch 030/60 | loss 0.5983 | train_acc 78.76% | test_acc 77.75%
+epoch 031/60 | loss 0.5843 | train_acc 79.55% | test_acc 78.48%
+epoch 032/60 | loss 0.5628 | train_acc 80.08% | test_acc 77.71%
+epoch 033/60 | loss 0.5425 | train_acc 80.83% | test_acc 79.48%
+epoch 034/60 | loss 0.5219 | train_acc 81.56% | test_acc 78.62%
+epoch 035/60 | loss 0.4962 | train_acc 82.45% | test_acc 79.16%
+epoch 036/60 | loss 0.4849 | train_acc 82.82% | test_acc 80.50%
+epoch 037/60 | loss 0.4604 | train_acc 83.68% | test_acc 81.46%
+epoch 038/60 | loss 0.4460 | train_acc 84.04% | test_acc 81.04%
+epoch 039/60 | loss 0.4202 | train_acc 85.11% | test_acc 80.92%
+epoch 040/60 | loss 0.4058 | train_acc 85.67% | test_acc 81.87%
+epoch 041/60 | loss 0.3841 | train_acc 86.40% | test_acc 81.20%
+epoch 042/60 | loss 0.3709 | train_acc 86.74% | test_acc 80.58%
+epoch 043/60 | loss 0.3423 | train_acc 87.82% | test_acc 82.36%
+epoch 044/60 | loss 0.3296 | train_acc 88.21% | test_acc 82.74%
+epoch 045/60 | loss 0.3041 | train_acc 89.33% | test_acc 82.53%
+epoch 046/60 | loss 0.2897 | train_acc 89.63% | test_acc 81.85%
+epoch 047/60 | loss 0.2685 | train_acc 90.49% | test_acc 82.43%
+epoch 048/60 | loss 0.2572 | train_acc 90.81% | test_acc 82.95%
+epoch 049/60 | loss 0.2405 | train_acc 91.47% | test_acc 83.14%
+epoch 050/60 | loss 0.2241 | train_acc 91.97% | test_acc 82.90%
+epoch 051/60 | loss 0.2131 | train_acc 92.38% | test_acc 82.81%
+epoch 052/60 | loss 0.1998 | train_acc 92.78% | test_acc 83.20%
+epoch 053/60 | loss 0.1904 | train_acc 93.30% | test_acc 83.66%
+epoch 054/60 | loss 0.1771 | train_acc 93.67% | test_acc 83.25%
+epoch 055/60 | loss 0.1716 | train_acc 93.90% | test_acc 83.46%
+epoch 056/60 | loss 0.1673 | train_acc 94.08% | test_acc 83.43%
+epoch 057/60 | loss 0.1593 | train_acc 94.34% | test_acc 83.45%
+epoch 058/60 | loss 0.1554 | train_acc 94.59% | test_acc 83.52%
+epoch 059/60 | loss 0.1499 | train_acc 94.72% | test_acc 83.57%
+epoch 060/60 | loss 0.1496 | train_acc 94.67% | test_acc 83.60%
+
+================================================================
+run 76/81 | lr=0.001 wd=0.15 bs=256 drop_path_rate=0.0
+================================================================
+epoch 001/60 | loss 2.0599 | train_acc 23.62% | test_acc 26.23%
+epoch 002/60 | loss 1.8065 | train_acc 32.34% | test_acc 36.07%
+epoch 003/60 | loss 1.5288 | train_acc 43.74% | test_acc 46.78%
+epoch 004/60 | loss 1.3919 | train_acc 49.34% | test_acc 51.12%
+epoch 005/60 | loss 1.3379 | train_acc 51.50% | test_acc 52.33%
+epoch 006/60 | loss 1.3580 | train_acc 50.84% | test_acc 50.36%
+epoch 007/60 | loss 1.3806 | train_acc 49.88% | test_acc 50.65%
+epoch 008/60 | loss 1.3495 | train_acc 51.19% | test_acc 52.49%
+epoch 009/60 | loss 1.3234 | train_acc 51.95% | test_acc 55.01%
+epoch 010/60 | loss 1.3068 | train_acc 52.84% | test_acc 52.86%
+epoch 011/60 | loss 1.2658 | train_acc 54.06% | test_acc 55.42%
+epoch 012/60 | loss 1.2357 | train_acc 55.31% | test_acc 57.44%
+epoch 013/60 | loss 1.2073 | train_acc 56.45% | test_acc 56.80%
+epoch 014/60 | loss 1.1927 | train_acc 56.92% | test_acc 58.98%
+epoch 015/60 | loss 1.1630 | train_acc 58.10% | test_acc 58.28%
+epoch 016/60 | loss 1.1293 | train_acc 59.25% | test_acc 59.89%
+epoch 017/60 | loss 1.0948 | train_acc 60.64% | test_acc 61.37%
+epoch 018/60 | loss 1.0646 | train_acc 61.62% | test_acc 61.52%
+epoch 019/60 | loss 1.0295 | train_acc 62.91% | test_acc 63.82%
+epoch 020/60 | loss 1.0098 | train_acc 63.97% | test_acc 64.13%
+epoch 021/60 | loss 0.9756 | train_acc 65.16% | test_acc 66.49%
+epoch 022/60 | loss 0.9397 | train_acc 66.39% | test_acc 68.41%
+epoch 023/60 | loss 0.8990 | train_acc 67.87% | test_acc 68.14%
+epoch 024/60 | loss 0.8636 | train_acc 69.19% | test_acc 69.79%
+epoch 025/60 | loss 0.8389 | train_acc 70.15% | test_acc 69.29%
+epoch 026/60 | loss 0.8037 | train_acc 71.55% | test_acc 71.61%
+epoch 027/60 | loss 0.7592 | train_acc 73.25% | test_acc 73.01%
+epoch 028/60 | loss 0.7250 | train_acc 74.16% | test_acc 73.28%
+epoch 029/60 | loss 0.6948 | train_acc 75.46% | test_acc 73.91%
+epoch 030/60 | loss 0.6697 | train_acc 76.42% | test_acc 75.42%
+epoch 031/60 | loss 0.6375 | train_acc 77.33% | test_acc 75.47%
+epoch 032/60 | loss 0.6128 | train_acc 78.31% | test_acc 76.87%
+epoch 033/60 | loss 0.5853 | train_acc 79.24% | test_acc 76.32%
+epoch 034/60 | loss 0.5601 | train_acc 80.15% | test_acc 77.89%
+epoch 035/60 | loss 0.5310 | train_acc 81.00% | test_acc 77.68%
+epoch 036/60 | loss 0.5134 | train_acc 81.78% | test_acc 78.91%
+epoch 037/60 | loss 0.4874 | train_acc 82.84% | test_acc 79.32%
+epoch 038/60 | loss 0.4586 | train_acc 83.71% | test_acc 79.29%
+epoch 039/60 | loss 0.4348 | train_acc 84.55% | test_acc 79.33%
+epoch 040/60 | loss 0.4055 | train_acc 85.53% | test_acc 80.36%
+epoch 041/60 | loss 0.3848 | train_acc 86.28% | test_acc 80.57%
+epoch 042/60 | loss 0.3606 | train_acc 87.17% | test_acc 80.74%
+epoch 043/60 | loss 0.3384 | train_acc 87.94% | test_acc 80.29%
+epoch 044/60 | loss 0.3042 | train_acc 89.39% | test_acc 80.81%
+epoch 045/60 | loss 0.2873 | train_acc 89.80% | test_acc 80.35%
+epoch 046/60 | loss 0.2612 | train_acc 90.62% | test_acc 81.42%
+epoch 047/60 | loss 0.2363 | train_acc 91.61% | test_acc 81.12%
+epoch 048/60 | loss 0.2206 | train_acc 92.14% | test_acc 81.22%
+epoch 049/60 | loss 0.1995 | train_acc 92.86% | test_acc 81.39%
+epoch 050/60 | loss 0.1809 | train_acc 93.65% | test_acc 81.79%
+epoch 051/60 | loss 0.1649 | train_acc 94.08% | test_acc 81.61%
+epoch 052/60 | loss 0.1536 | train_acc 94.66% | test_acc 81.32%
+epoch 053/60 | loss 0.1384 | train_acc 95.20% | test_acc 81.39%
+epoch 054/60 | loss 0.1285 | train_acc 95.58% | test_acc 81.59%
+epoch 055/60 | loss 0.1204 | train_acc 95.66% | test_acc 81.59%
+epoch 056/60 | loss 0.1126 | train_acc 96.15% | test_acc 81.70%
+epoch 057/60 | loss 0.1046 | train_acc 96.48% | test_acc 81.94%
+epoch 058/60 | loss 0.1010 | train_acc 96.49% | test_acc 81.53%
+epoch 059/60 | loss 0.0989 | train_acc 96.70% | test_acc 81.84%
+epoch 060/60 | loss 0.0950 | train_acc 96.78% | test_acc 81.82%
+
+================================================================
+run 77/81 | lr=0.001 wd=0.15 bs=256 drop_path_rate=0.1
+================================================================
+epoch 001/60 | loss 2.0709 | train_acc 23.58% | test_acc 26.63%
+epoch 002/60 | loss 1.8313 | train_acc 31.68% | test_acc 35.74%
+epoch 003/60 | loss 1.5719 | train_acc 41.82% | test_acc 44.74%
+epoch 004/60 | loss 1.3980 | train_acc 48.95% | test_acc 49.62%
+epoch 005/60 | loss 1.3598 | train_acc 50.55% | test_acc 50.84%
+epoch 006/60 | loss 1.3661 | train_acc 50.20% | test_acc 50.30%
+epoch 007/60 | loss 1.3725 | train_acc 50.01% | test_acc 50.26%
+epoch 008/60 | loss 1.3448 | train_acc 51.14% | test_acc 52.78%
+epoch 009/60 | loss 1.3288 | train_acc 51.69% | test_acc 51.07%
+epoch 010/60 | loss 1.3204 | train_acc 52.19% | test_acc 50.86%
+epoch 011/60 | loss 1.2798 | train_acc 53.69% | test_acc 55.03%
+epoch 012/60 | loss 1.2249 | train_acc 55.61% | test_acc 59.06%
+epoch 013/60 | loss 1.1972 | train_acc 56.60% | test_acc 57.55%
+epoch 014/60 | loss 1.1611 | train_acc 58.25% | test_acc 60.83%
+epoch 015/60 | loss 1.1301 | train_acc 59.27% | test_acc 61.03%
+epoch 016/60 | loss 1.0940 | train_acc 60.48% | test_acc 62.39%
+epoch 017/60 | loss 1.0656 | train_acc 62.09% | test_acc 65.16%
+epoch 018/60 | loss 1.0257 | train_acc 63.31% | test_acc 63.48%
+epoch 019/60 | loss 0.9950 | train_acc 64.19% | test_acc 65.81%
+epoch 020/60 | loss 0.9631 | train_acc 65.68% | test_acc 66.50%
+epoch 021/60 | loss 0.9218 | train_acc 67.15% | test_acc 68.79%
+epoch 022/60 | loss 0.8927 | train_acc 68.11% | test_acc 70.01%
+epoch 023/60 | loss 0.8516 | train_acc 69.77% | test_acc 71.08%
+epoch 024/60 | loss 0.8217 | train_acc 70.82% | test_acc 71.23%
+epoch 025/60 | loss 0.7826 | train_acc 72.39% | test_acc 71.84%
+epoch 026/60 | loss 0.7551 | train_acc 73.30% | test_acc 71.29%
+epoch 027/60 | loss 0.7335 | train_acc 74.20% | test_acc 75.94%
+epoch 028/60 | loss 0.6995 | train_acc 75.28% | test_acc 74.64%
+epoch 029/60 | loss 0.6725 | train_acc 76.03% | test_acc 75.25%
+epoch 030/60 | loss 0.6531 | train_acc 76.82% | test_acc 75.41%
+epoch 031/60 | loss 0.6253 | train_acc 78.10% | test_acc 77.35%
+epoch 032/60 | loss 0.6049 | train_acc 78.70% | test_acc 77.14%
+epoch 033/60 | loss 0.5770 | train_acc 79.47% | test_acc 77.91%
+epoch 034/60 | loss 0.5483 | train_acc 80.62% | test_acc 79.39%
+epoch 035/60 | loss 0.5321 | train_acc 81.02% | test_acc 78.54%
+epoch 036/60 | loss 0.5169 | train_acc 81.58% | test_acc 79.42%
+epoch 037/60 | loss 0.4842 | train_acc 82.88% | test_acc 79.50%
+epoch 038/60 | loss 0.4672 | train_acc 83.43% | test_acc 79.89%
+epoch 039/60 | loss 0.4411 | train_acc 84.44% | test_acc 80.41%
+epoch 040/60 | loss 0.4260 | train_acc 84.97% | test_acc 81.09%
+epoch 041/60 | loss 0.3977 | train_acc 85.79% | test_acc 80.55%
+epoch 042/60 | loss 0.3807 | train_acc 86.43% | test_acc 81.09%
+epoch 043/60 | loss 0.3599 | train_acc 87.11% | test_acc 81.38%
+epoch 044/60 | loss 0.3335 | train_acc 88.08% | test_acc 81.61%
+epoch 045/60 | loss 0.3162 | train_acc 88.69% | test_acc 81.51%
+epoch 046/60 | loss 0.2988 | train_acc 89.35% | test_acc 82.07%
+epoch 047/60 | loss 0.2729 | train_acc 90.38% | test_acc 81.89%
+epoch 048/60 | loss 0.2564 | train_acc 90.98% | test_acc 82.29%
+epoch 049/60 | loss 0.2449 | train_acc 91.30% | test_acc 82.34%
+epoch 050/60 | loss 0.2256 | train_acc 91.99% | test_acc 82.51%
+epoch 051/60 | loss 0.2096 | train_acc 92.66% | test_acc 82.97%
+epoch 052/60 | loss 0.1976 | train_acc 93.09% | test_acc 82.65%
+epoch 053/60 | loss 0.1877 | train_acc 93.45% | test_acc 82.52%
+epoch 054/60 | loss 0.1723 | train_acc 94.00% | test_acc 82.55%
+epoch 055/60 | loss 0.1660 | train_acc 94.08% | test_acc 82.51%
+epoch 056/60 | loss 0.1582 | train_acc 94.50% | test_acc 82.89%
+epoch 057/60 | loss 0.1499 | train_acc 94.82% | test_acc 82.91%
+epoch 058/60 | loss 0.1488 | train_acc 94.73% | test_acc 82.87%
+epoch 059/60 | loss 0.1459 | train_acc 94.88% | test_acc 82.99%
+epoch 060/60 | loss 0.1405 | train_acc 95.16% | test_acc 82.96%
+
+================================================================
+run 78/81 | lr=0.001 wd=0.15 bs=256 drop_path_rate=0.2
+================================================================
+epoch 001/60 | loss 2.0932 | train_acc 22.51% | test_acc 25.93%
+epoch 002/60 | loss 1.7946 | train_acc 32.68% | test_acc 40.59%
+epoch 003/60 | loss 1.5302 | train_acc 43.55% | test_acc 43.89%
+epoch 004/60 | loss 1.3932 | train_acc 48.93% | test_acc 54.55%
+epoch 005/60 | loss 1.3424 | train_acc 51.21% | test_acc 49.38%
+epoch 006/60 | loss 1.3618 | train_acc 50.47% | test_acc 54.35%
+epoch 007/60 | loss 1.3523 | train_acc 50.95% | test_acc 51.29%
+epoch 008/60 | loss 1.3300 | train_acc 52.05% | test_acc 50.98%
+epoch 009/60 | loss 1.3220 | train_acc 52.11% | test_acc 53.92%
+epoch 010/60 | loss 1.2661 | train_acc 54.06% | test_acc 55.05%
+epoch 011/60 | loss 1.2525 | train_acc 54.62% | test_acc 56.88%
+epoch 012/60 | loss 1.2029 | train_acc 56.44% | test_acc 58.47%
+epoch 013/60 | loss 1.1847 | train_acc 56.96% | test_acc 61.05%
+epoch 014/60 | loss 1.1352 | train_acc 59.08% | test_acc 59.73%
+epoch 015/60 | loss 1.1061 | train_acc 60.31% | test_acc 61.47%
+epoch 016/60 | loss 1.0837 | train_acc 60.88% | test_acc 62.86%
+epoch 017/60 | loss 1.0620 | train_acc 61.86% | test_acc 63.51%
+epoch 018/60 | loss 1.0229 | train_acc 63.38% | test_acc 65.01%
+epoch 019/60 | loss 0.9836 | train_acc 64.92% | test_acc 67.22%
+epoch 020/60 | loss 0.9532 | train_acc 65.88% | test_acc 67.77%
+epoch 021/60 | loss 0.9168 | train_acc 67.27% | test_acc 68.50%
+epoch 022/60 | loss 0.8769 | train_acc 68.72% | test_acc 69.82%
+epoch 023/60 | loss 0.8415 | train_acc 70.16% | test_acc 68.34%
+epoch 024/60 | loss 0.8112 | train_acc 71.27% | test_acc 72.58%
+epoch 025/60 | loss 0.7782 | train_acc 72.32% | test_acc 72.35%
+epoch 026/60 | loss 0.7593 | train_acc 73.09% | test_acc 74.80%
+epoch 027/60 | loss 0.7244 | train_acc 74.34% | test_acc 74.68%
+epoch 028/60 | loss 0.7070 | train_acc 75.03% | test_acc 74.59%
+epoch 029/60 | loss 0.6691 | train_acc 76.40% | test_acc 76.29%
+epoch 030/60 | loss 0.6451 | train_acc 77.24% | test_acc 76.03%
+epoch 031/60 | loss 0.6242 | train_acc 78.08% | test_acc 77.82%
+epoch 032/60 | loss 0.6080 | train_acc 78.60% | test_acc 77.69%
+epoch 033/60 | loss 0.5809 | train_acc 79.59% | test_acc 77.50%
+epoch 034/60 | loss 0.5577 | train_acc 80.42% | test_acc 78.84%
+epoch 035/60 | loss 0.5418 | train_acc 80.83% | test_acc 79.33%
+epoch 036/60 | loss 0.5218 | train_acc 81.44% | test_acc 79.85%
+epoch 037/60 | loss 0.4953 | train_acc 82.37% | test_acc 80.25%
+epoch 038/60 | loss 0.4744 | train_acc 83.36% | test_acc 80.12%
+epoch 039/60 | loss 0.4600 | train_acc 83.66% | test_acc 80.52%
+epoch 040/60 | loss 0.4327 | train_acc 84.61% | test_acc 81.38%
+epoch 041/60 | loss 0.4167 | train_acc 85.09% | test_acc 81.74%
+epoch 042/60 | loss 0.3901 | train_acc 85.97% | test_acc 81.80%
+epoch 043/60 | loss 0.3685 | train_acc 86.94% | test_acc 81.74%
+epoch 044/60 | loss 0.3490 | train_acc 87.51% | test_acc 82.44%
+epoch 045/60 | loss 0.3316 | train_acc 88.20% | test_acc 82.37%
+epoch 046/60 | loss 0.3152 | train_acc 88.76% | test_acc 82.50%
+epoch 047/60 | loss 0.2943 | train_acc 89.68% | test_acc 82.97%
+epoch 048/60 | loss 0.2772 | train_acc 89.94% | test_acc 82.36%
+epoch 049/60 | loss 0.2648 | train_acc 90.64% | test_acc 82.96%
+epoch 050/60 | loss 0.2425 | train_acc 91.43% | test_acc 83.32%
+epoch 051/60 | loss 0.2340 | train_acc 91.64% | test_acc 83.24%
+epoch 052/60 | loss 0.2135 | train_acc 92.41% | test_acc 82.96%
+epoch 053/60 | loss 0.2037 | train_acc 92.80% | test_acc 83.11%
+epoch 054/60 | loss 0.2006 | train_acc 92.94% | test_acc 83.09%
+epoch 055/60 | loss 0.1872 | train_acc 93.35% | test_acc 83.42%
+epoch 056/60 | loss 0.1816 | train_acc 93.48% | test_acc 83.17%
+epoch 057/60 | loss 0.1737 | train_acc 93.88% | test_acc 83.39%
+epoch 058/60 | loss 0.1686 | train_acc 94.07% | test_acc 83.35%
+epoch 059/60 | loss 0.1665 | train_acc 94.18% | test_acc 83.30%
+epoch 060/60 | loss 0.1672 | train_acc 94.14% | test_acc 83.42%
+
+================================================================
+run 79/81 | lr=0.001 wd=0.15 bs=512 drop_path_rate=0.0
+================================================================
+epoch 001/60 | loss 2.0454 | train_acc 24.11% | test_acc 27.32%
+epoch 002/60 | loss 1.8498 | train_acc 30.92% | test_acc 36.18%
+epoch 003/60 | loss 1.6346 | train_acc 39.32% | test_acc 42.36%
+epoch 004/60 | loss 1.4451 | train_acc 47.30% | test_acc 48.85%
+epoch 005/60 | loss 1.3558 | train_acc 50.71% | test_acc 54.90%
+epoch 006/60 | loss 1.2913 | train_acc 52.96% | test_acc 55.38%
+epoch 007/60 | loss 1.2304 | train_acc 55.68% | test_acc 57.66%
+epoch 008/60 | loss 1.2013 | train_acc 56.66% | test_acc 56.98%
+epoch 009/60 | loss 1.1674 | train_acc 57.99% | test_acc 58.37%
+epoch 010/60 | loss 1.1268 | train_acc 59.46% | test_acc 59.74%
+epoch 011/60 | loss 1.1199 | train_acc 59.75% | test_acc 62.52%
+epoch 012/60 | loss 1.0859 | train_acc 61.19% | test_acc 62.93%
+epoch 013/60 | loss 1.0663 | train_acc 61.80% | test_acc 64.30%
+epoch 014/60 | loss 1.0397 | train_acc 62.69% | test_acc 63.95%
+epoch 015/60 | loss 1.0044 | train_acc 64.02% | test_acc 64.28%
+epoch 016/60 | loss 0.9933 | train_acc 64.56% | test_acc 67.05%
+epoch 017/60 | loss 0.9380 | train_acc 66.61% | test_acc 67.82%
+epoch 018/60 | loss 0.9318 | train_acc 66.93% | test_acc 67.36%
+epoch 019/60 | loss 0.9004 | train_acc 67.88% | test_acc 68.26%
+epoch 020/60 | loss 0.8577 | train_acc 69.52% | test_acc 69.23%
+epoch 021/60 | loss 0.8316 | train_acc 70.35% | test_acc 69.87%
+epoch 022/60 | loss 0.8006 | train_acc 71.56% | test_acc 72.08%
+epoch 023/60 | loss 0.7762 | train_acc 72.48% | test_acc 72.60%
+epoch 024/60 | loss 0.7528 | train_acc 73.34% | test_acc 73.86%
+epoch 025/60 | loss 0.7205 | train_acc 74.61% | test_acc 74.60%
+epoch 026/60 | loss 0.7055 | train_acc 74.99% | test_acc 75.36%
+epoch 027/60 | loss 0.6790 | train_acc 76.10% | test_acc 75.55%
+epoch 028/60 | loss 0.6449 | train_acc 77.26% | test_acc 77.35%
+epoch 029/60 | loss 0.6214 | train_acc 78.09% | test_acc 76.56%
+epoch 030/60 | loss 0.6007 | train_acc 78.71% | test_acc 75.77%
+epoch 031/60 | loss 0.5837 | train_acc 79.32% | test_acc 77.77%
+epoch 032/60 | loss 0.5587 | train_acc 80.23% | test_acc 77.84%
+epoch 033/60 | loss 0.5382 | train_acc 81.02% | test_acc 78.65%
+epoch 034/60 | loss 0.5208 | train_acc 81.62% | test_acc 79.75%
+epoch 035/60 | loss 0.4967 | train_acc 82.40% | test_acc 79.57%
+epoch 036/60 | loss 0.4696 | train_acc 83.36% | test_acc 80.39%
+epoch 037/60 | loss 0.4555 | train_acc 83.90% | test_acc 79.60%
+epoch 038/60 | loss 0.4399 | train_acc 84.43% | test_acc 80.19%
+epoch 039/60 | loss 0.4158 | train_acc 85.10% | test_acc 81.15%
+epoch 040/60 | loss 0.3917 | train_acc 86.16% | test_acc 81.20%
+epoch 041/60 | loss 0.3703 | train_acc 86.82% | test_acc 80.97%
+epoch 042/60 | loss 0.3506 | train_acc 87.36% | test_acc 81.28%
+epoch 043/60 | loss 0.3282 | train_acc 88.28% | test_acc 81.91%
+epoch 044/60 | loss 0.3142 | train_acc 88.91% | test_acc 82.11%
+epoch 045/60 | loss 0.2920 | train_acc 89.63% | test_acc 82.22%
+epoch 046/60 | loss 0.2718 | train_acc 90.30% | test_acc 81.71%
+epoch 047/60 | loss 0.2562 | train_acc 90.87% | test_acc 82.28%
+epoch 048/60 | loss 0.2351 | train_acc 91.54% | test_acc 82.29%
+epoch 049/60 | loss 0.2212 | train_acc 92.17% | test_acc 82.27%
+epoch 050/60 | loss 0.2048 | train_acc 92.69% | test_acc 82.02%
+epoch 051/60 | loss 0.1913 | train_acc 93.36% | test_acc 82.12%
+epoch 052/60 | loss 0.1724 | train_acc 93.92% | test_acc 82.35%
+epoch 053/60 | loss 0.1621 | train_acc 94.35% | test_acc 82.45%
+epoch 054/60 | loss 0.1510 | train_acc 94.77% | test_acc 82.73%
+epoch 055/60 | loss 0.1424 | train_acc 95.03% | test_acc 82.48%
+epoch 056/60 | loss 0.1359 | train_acc 95.27% | test_acc 82.39%
+epoch 057/60 | loss 0.1276 | train_acc 95.57% | test_acc 82.68%
+epoch 058/60 | loss 0.1245 | train_acc 95.76% | test_acc 82.45%
+epoch 059/60 | loss 0.1222 | train_acc 95.77% | test_acc 82.91%
+epoch 060/60 | loss 0.1178 | train_acc 96.04% | test_acc 82.70%
+
+================================================================
+run 80/81 | lr=0.001 wd=0.15 bs=512 drop_path_rate=0.1
+================================================================
+epoch 001/60 | loss 2.0672 | train_acc 23.32% | test_acc 26.98%
+epoch 002/60 | loss 1.8314 | train_acc 31.04% | test_acc 34.33%
+epoch 003/60 | loss 1.6007 | train_acc 40.77% | test_acc 46.29%
+epoch 004/60 | loss 1.4087 | train_acc 48.62% | test_acc 52.94%
+epoch 005/60 | loss 1.3164 | train_acc 51.96% | test_acc 54.62%
+epoch 006/60 | loss 1.2533 | train_acc 54.87% | test_acc 56.47%
+epoch 007/60 | loss 1.1945 | train_acc 56.76% | test_acc 57.16%
+epoch 008/60 | loss 1.1620 | train_acc 58.01% | test_acc 59.77%
+epoch 009/60 | loss 1.1226 | train_acc 59.63% | test_acc 60.55%
+epoch 010/60 | loss 1.0932 | train_acc 60.63% | test_acc 61.08%
+epoch 011/60 | loss 1.0701 | train_acc 61.75% | test_acc 62.89%
+epoch 012/60 | loss 1.0273 | train_acc 63.18% | test_acc 65.02%
+epoch 013/60 | loss 1.0101 | train_acc 63.90% | test_acc 64.95%
+epoch 014/60 | loss 0.9560 | train_acc 65.94% | test_acc 66.43%
+epoch 015/60 | loss 0.9316 | train_acc 66.82% | test_acc 67.12%
+epoch 016/60 | loss 0.9088 | train_acc 67.50% | test_acc 67.49%
+epoch 017/60 | loss 0.8842 | train_acc 68.44% | test_acc 70.59%
+epoch 018/60 | loss 0.8360 | train_acc 70.26% | test_acc 70.69%
+epoch 019/60 | loss 0.8115 | train_acc 71.33% | test_acc 71.39%
+epoch 020/60 | loss 0.7859 | train_acc 72.04% | test_acc 71.40%
+epoch 021/60 | loss 0.7625 | train_acc 73.15% | test_acc 74.39%
+epoch 022/60 | loss 0.7328 | train_acc 73.94% | test_acc 74.23%
+epoch 023/60 | loss 0.6961 | train_acc 75.39% | test_acc 74.73%
+epoch 024/60 | loss 0.6872 | train_acc 75.60% | test_acc 74.86%
+epoch 025/60 | loss 0.6538 | train_acc 76.87% | test_acc 77.02%
+epoch 026/60 | loss 0.6298 | train_acc 77.55% | test_acc 76.53%
+epoch 027/60 | loss 0.6117 | train_acc 78.22% | test_acc 76.62%
+epoch 028/60 | loss 0.5914 | train_acc 79.03% | test_acc 76.91%
+epoch 029/60 | loss 0.5736 | train_acc 79.66% | test_acc 77.18%
+epoch 030/60 | loss 0.5410 | train_acc 81.04% | test_acc 79.24%
+epoch 031/60 | loss 0.5248 | train_acc 81.55% | test_acc 78.27%
+epoch 032/60 | loss 0.5025 | train_acc 82.23% | test_acc 79.58%
+epoch 033/60 | loss 0.4807 | train_acc 83.04% | test_acc 79.35%
+epoch 034/60 | loss 0.4596 | train_acc 83.75% | test_acc 80.50%
+epoch 035/60 | loss 0.4380 | train_acc 84.39% | test_acc 80.47%
+epoch 036/60 | loss 0.4243 | train_acc 84.88% | test_acc 80.73%
+epoch 037/60 | loss 0.4016 | train_acc 85.79% | test_acc 81.20%
+epoch 038/60 | loss 0.3762 | train_acc 86.65% | test_acc 80.85%
+epoch 039/60 | loss 0.3574 | train_acc 87.32% | test_acc 81.47%
+epoch 040/60 | loss 0.3402 | train_acc 87.90% | test_acc 81.95%
+epoch 041/60 | loss 0.3171 | train_acc 88.96% | test_acc 82.36%
+epoch 042/60 | loss 0.3009 | train_acc 89.21% | test_acc 82.43%
+epoch 043/60 | loss 0.2778 | train_acc 90.17% | test_acc 82.12%
+epoch 044/60 | loss 0.2600 | train_acc 90.77% | test_acc 82.58%
+epoch 045/60 | loss 0.2399 | train_acc 91.54% | test_acc 82.78%
+epoch 046/60 | loss 0.2287 | train_acc 91.94% | test_acc 82.68%
+epoch 047/60 | loss 0.2020 | train_acc 92.85% | test_acc 83.30%
+epoch 048/60 | loss 0.1857 | train_acc 93.37% | test_acc 83.27%
+epoch 049/60 | loss 0.1758 | train_acc 93.77% | test_acc 82.77%
+epoch 050/60 | loss 0.1590 | train_acc 94.48% | test_acc 83.49%
+epoch 051/60 | loss 0.1429 | train_acc 94.98% | test_acc 83.37%
+epoch 052/60 | loss 0.1362 | train_acc 95.22% | test_acc 83.24%
+epoch 053/60 | loss 0.1194 | train_acc 95.86% | test_acc 83.76%
+epoch 054/60 | loss 0.1148 | train_acc 95.95% | test_acc 83.85%
+epoch 055/60 | loss 0.1071 | train_acc 96.27% | test_acc 83.77%
+epoch 056/60 | loss 0.1030 | train_acc 96.35% | test_acc 83.77%
+epoch 057/60 | loss 0.0969 | train_acc 96.68% | test_acc 83.87%
+epoch 058/60 | loss 0.0940 | train_acc 96.75% | test_acc 83.58%
+epoch 059/60 | loss 0.0898 | train_acc 96.96% | test_acc 83.66%
+epoch 060/60 | loss 0.0888 | train_acc 96.97% | test_acc 83.90%
+
+================================================================
+run 81/81 | lr=0.001 wd=0.15 bs=512 drop_path_rate=0.2
+================================================================
+epoch 001/60 | loss 2.0874 | train_acc 22.20% | test_acc 26.66%
+epoch 002/60 | loss 1.8468 | train_acc 30.80% | test_acc 33.89%
+epoch 003/60 | loss 1.5905 | train_acc 41.23% | test_acc 46.44%
+epoch 004/60 | loss 1.4252 | train_acc 48.13% | test_acc 51.42%
+epoch 005/60 | loss 1.3383 | train_acc 51.54% | test_acc 55.27%
+epoch 006/60 | loss 1.2758 | train_acc 53.81% | test_acc 53.91%
+epoch 007/60 | loss 1.2211 | train_acc 55.94% | test_acc 56.66%
+epoch 008/60 | loss 1.1844 | train_acc 57.24% | test_acc 57.31%
+epoch 009/60 | loss 1.1650 | train_acc 57.80% | test_acc 61.13%
+epoch 010/60 | loss 1.1208 | train_acc 59.50% | test_acc 60.85%
+epoch 011/60 | loss 1.0859 | train_acc 61.06% | test_acc 60.81%
+epoch 012/60 | loss 1.0643 | train_acc 61.74% | test_acc 64.33%
+epoch 013/60 | loss 1.0344 | train_acc 62.92% | test_acc 63.95%
+epoch 014/60 | loss 1.0051 | train_acc 64.02% | test_acc 66.37%
+epoch 015/60 | loss 0.9692 | train_acc 65.46% | test_acc 66.94%
+epoch 016/60 | loss 0.9474 | train_acc 66.50% | test_acc 67.75%
+epoch 017/60 | loss 0.9150 | train_acc 67.54% | test_acc 68.71%
+epoch 018/60 | loss 0.8783 | train_acc 68.79% | test_acc 68.58%
+epoch 019/60 | loss 0.8493 | train_acc 69.58% | test_acc 70.65%
+epoch 020/60 | loss 0.8236 | train_acc 70.59% | test_acc 72.60%
+epoch 021/60 | loss 0.7915 | train_acc 72.02% | test_acc 72.44%
+epoch 022/60 | loss 0.7621 | train_acc 73.00% | test_acc 72.38%
+epoch 023/60 | loss 0.7395 | train_acc 73.81% | test_acc 74.65%
+epoch 024/60 | loss 0.7153 | train_acc 74.70% | test_acc 75.07%
+epoch 025/60 | loss 0.6864 | train_acc 75.78% | test_acc 74.57%
+epoch 026/60 | loss 0.6638 | train_acc 76.51% | test_acc 76.73%
+epoch 027/60 | loss 0.6395 | train_acc 77.36% | test_acc 77.52%
+epoch 028/60 | loss 0.6155 | train_acc 78.17% | test_acc 77.98%
+epoch 029/60 | loss 0.5907 | train_acc 79.27% | test_acc 78.07%
+epoch 030/60 | loss 0.5731 | train_acc 79.74% | test_acc 78.63%
+epoch 031/60 | loss 0.5600 | train_acc 80.10% | test_acc 78.92%
+epoch 032/60 | loss 0.5319 | train_acc 81.28% | test_acc 79.37%
+epoch 033/60 | loss 0.5150 | train_acc 81.83% | test_acc 80.14%
+epoch 034/60 | loss 0.5002 | train_acc 82.49% | test_acc 80.26%
+epoch 035/60 | loss 0.4757 | train_acc 83.11% | test_acc 80.90%
+epoch 036/60 | loss 0.4588 | train_acc 83.96% | test_acc 80.60%
+epoch 037/60 | loss 0.4433 | train_acc 84.05% | test_acc 81.17%
+epoch 038/60 | loss 0.4235 | train_acc 84.99% | test_acc 81.55%
+epoch 039/60 | loss 0.4026 | train_acc 85.56% | test_acc 81.95%
+epoch 040/60 | loss 0.3875 | train_acc 86.33% | test_acc 81.98%
+epoch 041/60 | loss 0.3702 | train_acc 86.89% | test_acc 82.32%
+epoch 042/60 | loss 0.3493 | train_acc 87.73% | test_acc 82.50%
+epoch 043/60 | loss 0.3285 | train_acc 88.32% | test_acc 82.52%
+epoch 044/60 | loss 0.3144 | train_acc 88.89% | test_acc 82.56%
+epoch 045/60 | loss 0.2941 | train_acc 89.66% | test_acc 82.93%
+epoch 046/60 | loss 0.2813 | train_acc 90.02% | test_acc 83.20%
+epoch 047/60 | loss 0.2629 | train_acc 90.70% | test_acc 83.38%
+epoch 048/60 | loss 0.2434 | train_acc 91.44% | test_acc 83.44%
+epoch 049/60 | loss 0.2299 | train_acc 91.84% | test_acc 83.43%
+epoch 050/60 | loss 0.2179 | train_acc 92.36% | test_acc 83.50%
+epoch 051/60 | loss 0.2055 | train_acc 92.72% | test_acc 83.53%
+epoch 052/60 | loss 0.1895 | train_acc 93.26% | test_acc 83.43%
+epoch 053/60 | loss 0.1777 | train_acc 93.72% | test_acc 83.83%
+epoch 054/60 | loss 0.1741 | train_acc 93.96% | test_acc 83.73%
+epoch 055/60 | loss 0.1661 | train_acc 94.17% | test_acc 83.99%
+epoch 056/60 | loss 0.1616 | train_acc 94.30% | test_acc 83.82%
+epoch 057/60 | loss 0.1500 | train_acc 94.76% | test_acc 84.10%
+epoch 058/60 | loss 0.1496 | train_acc 94.72% | test_acc 83.76%
+epoch 059/60 | loss 0.1459 | train_acc 94.90% | test_acc 83.90%
+epoch 060/60 | loss 0.1411 | train_acc 95.16% | test_acc 83.79%
+
+Grid search finished in 1150.3 min
+
+Leaderboard (best test accuracy):
+ 1) acc=85.33% | lr=0.00033 wd=0.07 bs=128 dpr=0.2
+ 2) acc=84.97% | lr=0.00033 wd=0.15 bs=128 dpr=0.2
+ 3) acc=84.97% | lr=0.00033 wd=0.15 bs=128 dpr=0.1
+ 4) acc=84.95% | lr=0.00033 wd=0.07 bs=256 dpr=0.2
+ 5) acc=84.88% | lr=0.00033 wd=0.02 bs=128 dpr=0.2
+ 6) acc=84.78% | lr=0.00033 wd=0.07 bs=128 dpr=0.1
+ 7) acc=84.78% | lr=0.00033 wd=0.15 bs=256 dpr=0.2
+ 8) acc=84.66% | lr=0.00033 wd=0.07 bs=256 dpr=0.1
+ 9) acc=84.52% | lr=0.00033 wd=0.15 bs=256 dpr=0.1
+10) acc=84.48% | lr=0.00033 wd=0.02 bs=256 dpr=0.1
+11) acc=84.36% | lr=0.00033 wd=0.02 bs=512 dpr=0.2
+12) acc=84.32% | lr=0.00033 wd=0.07 bs=512 dpr=0.2
+13) acc=84.31% | lr=0.00033 wd=0.07 bs=256 dpr=0.0
+14) acc=84.31% | lr=0.00033 wd=0.02 bs=128 dpr=0.1
+15) acc=84.25% | lr=0.00033 wd=0.15 bs=512 dpr=0.1
+16) acc=84.21% | lr=0.00033 wd=0.15 bs=256 dpr=0.0
+17) acc=84.10% | lr=0.001 wd=0.15 bs=512 dpr=0.2
+18) acc=83.92% | lr=0.0001 wd=0.02 bs=128 dpr=0.2
+19) acc=83.90% | lr=0.001 wd=0.15 bs=512 dpr=0.1
+20) acc=83.87% | lr=0.00033 wd=0.02 bs=256 dpr=0.2
+21) acc=83.79% | lr=0.00033 wd=0.07 bs=128 dpr=0.0
+22) acc=83.78% | lr=0.00033 wd=0.15 bs=128 dpr=0.0
+23) acc=83.74% | lr=0.00033 wd=0.02 bs=128 dpr=0.0
+24) acc=83.67% | lr=0.00033 wd=0.02 bs=256 dpr=0.0
+25) acc=83.66% | lr=0.001 wd=0.15 bs=128 dpr=0.2
+26) acc=83.62% | lr=0.00033 wd=0.15 bs=512 dpr=0.2
+27) acc=83.60% | lr=0.00033 wd=0.07 bs=512 dpr=0.1
+28) acc=83.55% | lr=0.001 wd=0.15 bs=128 dpr=0.1
+29) acc=83.42% | lr=0.001 wd=0.15 bs=256 dpr=0.2
+30) acc=83.38% | lr=0.00033 wd=0.02 bs=512 dpr=0.1
+31) acc=83.29% | lr=0.0001 wd=0.15 bs=128 dpr=0.1
+32) acc=83.12% | lr=0.0001 wd=0.15 bs=128 dpr=0.2
+33) acc=83.11% | lr=0.00033 wd=0.15 bs=512 dpr=0.0
+34) acc=83.11% | lr=0.0001 wd=0.07 bs=128 dpr=0.2
+35) acc=83.05% | lr=0.0001 wd=0.15 bs=128 dpr=0.0
+36) acc=82.99% | lr=0.001 wd=0.15 bs=256 dpr=0.1
+37) acc=82.97% | lr=0.0001 wd=0.02 bs=128 dpr=0.1
+38) acc=82.96% | lr=0.00033 wd=0.07 bs=512 dpr=0.0
+39) acc=82.95% | lr=0.00033 wd=0.02 bs=512 dpr=0.0
+40) acc=82.91% | lr=0.001 wd=0.15 bs=512 dpr=0.0
+41) acc=82.66% | lr=0.001 wd=0.15 bs=128 dpr=0.0
+42) acc=82.58% | lr=0.0001 wd=0.07 bs=128 dpr=0.1
+43) acc=82.42% | lr=0.0001 wd=0.15 bs=256 dpr=0.2
+44) acc=82.36% | lr=0.0001 wd=0.07 bs=128 dpr=0.0
+45) acc=82.21% | lr=0.0001 wd=0.07 bs=256 dpr=0.2
+46) acc=82.07% | lr=0.0001 wd=0.02 bs=128 dpr=0.0
+47) acc=82.05% | lr=0.0001 wd=0.15 bs=256 dpr=0.0
+48) acc=82.01% | lr=0.0001 wd=0.02 bs=256 dpr=0.2
+49) acc=81.94% | lr=0.001 wd=0.15 bs=256 dpr=0.0
+50) acc=81.83% | lr=0.0001 wd=0.15 bs=256 dpr=0.1
+51) acc=81.59% | lr=0.0001 wd=0.02 bs=256 dpr=0.1
+52) acc=81.55% | lr=0.001 wd=0.07 bs=512 dpr=0.0
+53) acc=81.25% | lr=0.0001 wd=0.07 bs=256 dpr=0.1
+54) acc=81.24% | lr=0.0001 wd=0.07 bs=256 dpr=0.0
+55) acc=81.02% | lr=0.0001 wd=0.02 bs=256 dpr=0.0
+56) acc=80.81% | lr=0.0001 wd=0.15 bs=512 dpr=0.1
+57) acc=80.79% | lr=0.0001 wd=0.15 bs=512 dpr=0.2
+58) acc=80.76% | lr=0.0001 wd=0.07 bs=512 dpr=0.2
+59) acc=80.72% | lr=0.0001 wd=0.02 bs=512 dpr=0.1
+60) acc=80.30% | lr=0.0001 wd=0.07 bs=512 dpr=0.0
+61) acc=80.28% | lr=0.0001 wd=0.02 bs=512 dpr=0.0
+62) acc=80.17% | lr=0.0001 wd=0.07 bs=512 dpr=0.1
+63) acc=80.12% | lr=0.0001 wd=0.02 bs=512 dpr=0.2
+64) acc=79.85% | lr=0.001 wd=0.07 bs=128 dpr=0.0
+65) acc=79.66% | lr=0.0001 wd=0.15 bs=512 dpr=0.0
+66) acc=79.65% | lr=0.001 wd=0.07 bs=512 dpr=0.1
+67) acc=79.41% | lr=0.001 wd=0.07 bs=512 dpr=0.2
+68) acc=77.49% | lr=0.001 wd=0.07 bs=128 dpr=0.1
+69) acc=76.93% | lr=0.001 wd=0.07 bs=256 dpr=0.2
+70) acc=76.29% | lr=0.001 wd=0.02 bs=512 dpr=0.2
+71) acc=76.11% | lr=0.001 wd=0.07 bs=256 dpr=0.1
+72) acc=76.07% | lr=0.001 wd=0.02 bs=512 dpr=0.0
+73) acc=75.10% | lr=0.001 wd=0.07 bs=128 dpr=0.2
+74) acc=74.86% | lr=0.001 wd=0.07 bs=256 dpr=0.0
+75) acc=74.12% | lr=0.001 wd=0.02 bs=512 dpr=0.1
+76) acc=67.59% | lr=0.001 wd=0.02 bs=256 dpr=0.1
+77) acc=66.91% | lr=0.001 wd=0.02 bs=128 dpr=0.1
+78) acc=65.79% | lr=0.001 wd=0.02 bs=256 dpr=0.2
+79) acc=64.52% | lr=0.001 wd=0.02 bs=256 dpr=0.0
+80) acc=56.32% | lr=0.001 wd=0.02 bs=128 dpr=0.0
+81) acc=54.65% | lr=0.001 wd=0.02 bs=128 dpr=0.2
+(venv) pmark@mpc-lab:~/CS182$  test_acc 58.99%
+epoch 025/60 | loss 1.1373 | train_acc 58.93% | test_acc 59.84%
+epoch 026/60 | loss 1.1222 | train_acc 59.59% | test_acc 59.99%
+epoch 027/60 | loss 1.1143 | train_acc 59.80% | test_acc 59.91%
+epoch 028/60 | loss 1.1178 | train_acc 59.72% | test_acc 60.93%
+epoch 029/60 | loss 1.0699 | train_acc 61.55% | test_acc 62.46%
+epoch 030/60 | loss 1.0434 | train_acc 62.44% | test_acc 61.46%
+epoch 031/60 | loss 1.0388 | train_acc 62.29% | test_acc 62.09%
+epoch 032/60 | loss 1.0192 | train_acc 63.30% | test_acc 63.96%
+epoch 033/60 | loss 0.9809 | train_acc 64.67% | test_acc 64.30%
+epoch 034/60 | loss 0.9594 | train_acc 65.47% | test_acc 65.75%
+epoch 035/60 | loss 0.9427 | train_acc 66.26% | test_acc 65.90%
+epoch 036/60 | loss 0.9182 | train_acc 67.08% | test_acc 67.36%
+epoch 037/60 | loss 0.8880 | train_acc 68.08% | test_acc 67.65%
+epoch 038/60 | loss 0.8732 | train_acc 68.74% | test_acc 67.58%
+epoch 039/60 | loss 0.8567 | train_acc 69.32% | test_acc 68.39%
+epoch 040/60 | loss 0.8296 | train_acc 70.30% | test_acc 68.72%
+epoch 041/60 | loss 0.8163 | train_acc 70.77% | test_acc 69.87%
+epoch 042/60 | loss 0.7833 | train_acc 71.93% | test_acc 70.68%
+epoch 043/60 | loss 0.7632 | train_acc 72.85% | test_acc 70.32%
+epoch 044/60 | loss 0.7426 | train_acc 73.57% | test_acc 71.48%
+epoch 045/60 | loss 0.7355 | train_acc 73.81% | test_acc 71.96%
+epoch 046/60 | loss 0.7170 | train_acc 74.38% | test_acc 72.31%
+epoch 047/60 | loss 0.6932 | train_acc 75.28% | test_acc 72.51%
+epoch 048/60 | loss 0.6758 | train_acc 75.81% | test_acc 73.10%
+81) acc=54.65% | lr=0.001 wd=0.02 bs=128 dpr=0.200st_acc 83.79%=
