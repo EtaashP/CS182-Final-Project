@@ -2,11 +2,12 @@
 # Hypergradient descent on lr and weight decay for ViT-Small on CIFAR-10.
 
 import math
+import os
 from typing import Tuple
 
 import torch
 import torch.nn as nn
-from torch.optim import AdamW
+from torch.optim import Adam
 import higher
 
 from MainTrain import ViTSmallCIFAR, build_dataloaders, accuracy
@@ -29,9 +30,11 @@ class HyperParams:
         self.hyper_opt = torch.optim.Adam([self.log_lr, self.log_wd], lr=1e-3)
 
     def lr(self) -> float:
+        # Scalar learning rate for real training (no grad)
         return float(torch.exp(self.log_lr).item())
 
     def wd(self) -> float:
+        # Scalar weight decay for real training (no grad)
         return float(torch.exp(self.log_wd).item())
 
 
@@ -51,16 +54,24 @@ def hyper_step(
 ) -> float:
     """
     One hypergradient update:
-      - Unroll a few inner SGD steps on train data
+      - Unroll a few inner Adam steps on train data
       - Evaluate val loss at the end
       - Backprop through inner steps into hyperparameters
     """
 
     criterion = nn.CrossEntropyLoss()
 
-    base_opt = torch.optim.SGD(model.parameters(), lr=hyper.lr())
+    # Base optimizer that higher will "lift" to act on fmodel
+    base_opt = Adam(
+        model.parameters(),
+        lr=hyper.lr(),
+        betas=(0.9, 0.999),
+        eps=1e-8,
+        weight_decay=0.0,  # all WD handled via manual L2 term
+    )
 
-    with higher.innerloop_ctx(model, base_opt, copy_initial_weights=False) as (fmodel, diffopt):
+    # Use copy_initial_weights=True so fmodel starts from a cloned copy
+    with higher.innerloop_ctx(model, base_opt, copy_initial_weights=True) as (fmodel, diffopt):
 
         train_iter = iter(train_loader)
 
@@ -79,7 +90,7 @@ def hyper_step(
                 loss = criterion(logits, y)
 
                 # manual L2 weight decay so gradients flow into log_wd
-                wd = torch.exp(hyper.log_wd)
+                wd = torch.exp(hyper.log_wd)  # differentiable w.r.t. log_wd
                 l2_reg = 0.0
                 for p in fmodel.parameters():
                     l2_reg = l2_reg + (p ** 2).sum()
@@ -89,7 +100,7 @@ def hyper_step(
                 loss.backward()
                 diffopt.step()
 
-        # Validation loss after inner-loop
+        # Validation loss after inner-loop (no extra reg here)
         val_iter = iter(val_loader)
         val_loss = 0.0
         for _ in range(val_batches):
@@ -138,13 +149,15 @@ def evaluate_simple(model: nn.Module, loader, device: torch.device) -> float:
 def train_with_hypergrad(
     epochs: int = 30,
     batch_size: int = 256,
-    hyper_every: int = 5,
+    hyper_every: int = 1,   # hyper-step every epoch by default
     T_inner: int = 3,
     train_batches: int = 2,
     val_batches: int = 2,
 ) -> Tuple[nn.Module, HyperParams, float]:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("device:", device)
+
+    os.makedirs("checkpoints", exist_ok=True)
 
     # Data
     train_loader, val_loader = build_dataloaders(batch_size=batch_size, num_workers=4)
@@ -160,19 +173,20 @@ def train_with_hypergrad(
         mlp_ratio=4.0,
         drop_rate=0.0,
         attn_drop_rate=0.0,
-        drop_path_rate=0.1,  # pick a reasonable fixed dpr for HGD run
+        drop_path_rate=0.1,  # fixed for HGD run
     ).to(device)
 
     # Hyperparameters to adapt
     hyper = HyperParams(init_lr=3e-4, init_wd=0.05, device=device)
 
-    # Main optimizer; lr and wd will be overwritten from hyper each epoch
-    optimizer = AdamW(
+    # Main optimizer; lr will be overwritten from hyper each epoch
+    # Weight decay handled manually via L2 term in the loss
+    optimizer = Adam(
         model.parameters(),
         lr=hyper.lr(),
-        weight_decay=hyper.wd(),
         betas=(0.9, 0.999),
         eps=1e-8,
+        weight_decay=0.0,
     )
     criterion = nn.CrossEntropyLoss()
 
@@ -181,26 +195,34 @@ def train_with_hypergrad(
     for epoch in range(epochs):
         model.train()
 
-        # update optimizer learning rate & weight decay from hyperparameters
+        # update optimizer learning rate from hyperparameters
         for g in optimizer.param_groups:
             g["lr"] = hyper.lr()
-            g["weight_decay"] = hyper.wd()
 
         total_loss = 0.0
         total_correct = 0
         total = 0
 
+        # Training loop
         for images, targets in train_loader:
             images, targets = images.to(device), targets.to(device)
 
             optimizer.zero_grad()
             logits = model(images)
-            loss = criterion(logits, targets)
+            ce_loss = criterion(logits, targets)
+
+            # manual L2 weight decay using current scalar wd (no grad to hyper)
+            wd = hyper.wd()  # scalar (float)
+            l2_reg = 0.0
+            for p in model.parameters():
+                l2_reg = l2_reg + (p ** 2).sum()
+            loss = ce_loss + 0.5 * wd * l2_reg
+
             loss.backward()
             optimizer.step()
 
             bs = images.size(0)
-            total_loss += loss.item() * bs
+            total_loss += ce_loss.item() * bs  # reporting CE loss only
             total_correct += (logits.argmax(dim=1) == targets).sum().item()
             total += bs
 
@@ -235,6 +257,22 @@ def train_with_hypergrad(
                 f"    [hyper] val_loss={val_loss:.4f} "
                 f"-> lr {hyper.lr():.2e}, wd {hyper.wd():.2e}"
             )
+
+        # =======================
+        # Save full checkpoint
+        # =======================
+        checkpoint = {
+            "epoch": epoch + 1,
+            "model_state": model.state_dict(),
+            "optimizer_state": optimizer.state_dict(),
+            "hyper": {
+                "log_lr": hyper.log_lr.detach().cpu(),
+                "log_wd": hyper.log_wd.detach().cpu(),
+                "hyper_opt_state": hyper.hyper_opt.state_dict(),
+            },
+            "best_acc": best_acc,
+        }
+        torch.save(checkpoint, f"checkpoints/hgd_epoch_{epoch+1:03d}.pt")
 
     print(f"\nBest val_acc: {best_acc*100:.2f}%")
     return model, hyper, best_acc
