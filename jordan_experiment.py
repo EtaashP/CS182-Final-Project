@@ -445,7 +445,7 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--epochs", type=int, default=5)         # deafult=60
+    parser.add_argument("--epochs", type=int, default=5)         # deafult=60                  *****************FOR THE ACTUAL EXPERIMENT, SWITCH THAT 5 TO A 60*************************
     parser.add_argument("--warmup_epochs", type=int, default=5)
     parser.add_argument("--min_lr", type=float, default=1e-5)
     parser.add_argument("--num_workers", type=int, default=4)
