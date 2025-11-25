@@ -367,7 +367,9 @@ def run_phase(search_space, epochs, label, args, log, device, initial_state=None
 def run_one_hypertune(seed):
     random.seed(seed)
     parser = argparse.ArgumentParser()
-    parser.add_argument("--epochs", type=int, default=90)
+    #TODO: switch back when sending to Mark
+    #parser.add_argument("--epochs", type=int, default=90)
+    parser.add_argument("--epochs", type=int, default=5)
     parser.add_argument("--warmup_epochs", type=int, default=5)
     parser.add_argument("--min_lr", type=float, default=1e-5)
     parser.add_argument("--num_workers", type=int, default=4)
@@ -421,19 +423,20 @@ def run_one_hypertune(seed):
                                         args.grid_bss, args.grid_dprs))
 
     phase_epochs = args.phase_epochs or args.epochs // 3
-    phase_lengths = [int(phase_epochs/2), phase_epochs, max(1, args.epochs - int(phase_epochs/2)- phase_epochs)]
-
+    #TODO: change back when sending to mark
+    #phase_lengths = [int(phase_epochs/2), phase_epochs, max(1, args.epochs - int(phase_epochs/2)- phase_epochs)]
+    phase_lengths = [1, 2, 2]
     
     phase_results = []
-    phase1, log1 = run_phase(baseline_space, phase_lengths[0], "Phase 1 (baseline)")
+    phase1, log1 = run_phase(baseline_space, phase_lengths[0], "Phase 1 (baseline)", args, log, device, initial_state=None)
     phase1_best_state = phase1[0]["final_state"] if phase1 else None
     phase_results.append(phase1)
 
-    phase2, log2 = run_phase(grid_space, phase_lengths[1], "Phase 2 (grid search)", initial_state=phase1_best_state)
+    phase2, log2 = run_phase(grid_space, phase_lengths[1], "Phase 2 (grid search)", args, log, device, initial_state=phase1_best_state)
     phase2_best_state = phase2[0]["final_state"] if phase2 else None
     phase_results.append(phase2)
 
-    phase3, log3 = run_phase(grid_space, phase_lengths[2], "Phase 3 (grid search)", initial_state=phase2_best_state)
+    phase3, log3 = run_phase(grid_space, phase_lengths[2], "Phase 3 (grid search)", args, log, device, initial_state=phase2_best_state)
     phase_results.append(phase3)
     
     dfs = [log1, log2, log3]          # Replace with your training logs
@@ -460,7 +463,7 @@ def run_one_hypertune(seed):
         f.write("\n".join(log_lines))
     log(f"\nSaved results to {args.results_out}")
 
-def main(seed):
+def main():
     for seed in [4721, 8154, 2398, 6932, 1567]: run_one_hypertune(seed)
 if __name__ == "__main__":
     main()
