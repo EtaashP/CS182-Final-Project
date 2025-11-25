@@ -442,7 +442,7 @@ def run_one_hypertune(seed):
     dfs = [log1, log2, log3]          # Replace with your training logs
     sheet_names = ['Phase_1', 'Phase_2', 'Phase_3']  # Names for each sheet
     # Create an Excel file with multiple sheets
-    with pd.ExcelWriter("training_logs.xlsx", engine="openpyxl") as writer:
+    with pd.ExcelWriter(f"3_grid_seed_{seed}.xlsx", engine="openpyxl") as writer:
         for df, sheet in zip(dfs, sheet_names):
             df.to_excel(writer, sheet_name=sheet, index=False)
 
