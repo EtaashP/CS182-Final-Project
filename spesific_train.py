@@ -17,6 +17,7 @@ from torch.utils.data import DataLoader
 from torch.optim import AdamW
 from torch.optim.lr_scheduler import _LRScheduler
 from torchvision import datasets, transforms
+import pandas as pd
 
 # ---------------------------
 # Utilities
@@ -221,6 +222,9 @@ def build_dataloaders(batch_size: int, num_workers: int = 4) -> Tuple[DataLoader
 
     train_ds = datasets.CIFAR10(root="./data", train=True, transform=train_tf, download=True)
     test_ds = datasets.CIFAR10(root="./data", train=False, transform=test_tf, download=True)
+    #TODO: switch back when sending to mark
+    train_ds = torch.utils.data.Subset(train_ds, list(range(100)))
+    test_ds = torch.utils.data.Subset(test_ds, list(range(100)))
 
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,
                               num_workers=num_workers, pin_memory=True)
@@ -300,6 +304,7 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
     scheduler = WarmupCosineLR(optimizer, total_steps=total_steps, warmup_steps=warmup_steps, min_lr=min_lr)
 
     best_acc = 0.0
+    training_log = []
     for epoch in range(epochs):
         train_loss, train_acc = train_one_epoch(model, train_loader, optimizer, scaler, device)
         test_acc = evaluate(model, test_loader, device)
@@ -311,20 +316,56 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
         # Quick fix: recompute steps done and set last_epoch accordingly.
         scheduler.last_epoch = (epoch + 1) * math.ceil(50000 / cfg.batch_size) - 1
         scheduler.step()
-
+        training_log.append([cfg.lr, cfg.weight_decay, cfg.batch_size, cfg.drop_path_rate, train_loss, train_acc, test_acc])
         log_fn(f"epoch {epoch+1:03d}/{epochs} | loss {train_loss:.4f} | train_acc {train_acc*100:5.2f}% | test_acc {test_acc*100:5.2f}%")
 
     return {
         "config": cfg,
         "best_acc": best_acc,
-        "final_state": {k: v.detach().cpu() for k, v in model.state_dict().items()}
+        "final_state": {k: v.detach().cpu() for k, v in model.state_dict().items()},
+        "training_log":training_log
     }
 
 # ---------------------------
 # Grid Search
 # ---------------------------
+def run_phase(search_space, epochs, label, args, log, device, initial_state=None):
+    log(f"\n{label}: total runs={len(search_space)}, epochs per run={epochs}")
+    results: List[Dict[str, Any]] = []
+    start_phase = time.time()
+    training_logs = []
+    best_training_log = None
+    best_acc = float('-inf')
+    for i, (lr, wd, bs, dpr) in enumerate(search_space, 1):
+        log("\n" + "=" * 64)
+        log(f"{label} run {i}/{len(search_space)} | lr={lr} wd={wd} bs={bs} drop_path_rate={dpr}")
+        log("=" * 64)
+        cfg = RunConfig(lr=lr, weight_decay=wd, batch_size=bs, drop_path_rate=dpr)
+        res = run_training(cfg, epochs=epochs, warmup_epochs=args.warmup_epochs,
+                            min_lr=args.min_lr, device=device, num_workers=args.num_workers,
+                            log_fn=log, initial_state=initial_state)
+        results.append(res)
+        if res['best_acc'] > best_acc:
+            best_training_log = res['training_log']
+        results.append({"config": res['config'], "best_acc": res['best_acc']})
+    training_logs = pd.DataFrame(best_training_log)
+    training_logs.columns = ['lr', 'wd', 'bs', 'dpr', 'train loss', 'train accuracy', 'test accuracy']
+    elapsed_phase = time.time() - start_phase
+    log(f"\n{label} finished in {elapsed_phase/60:.1f} min\n")
 
-def main():
+    sorted_results = sorted(results, key=lambda r: r["best_acc"], reverse=True)
+    if sorted_results:
+        log(f"{label} leaderboard (best test accuracy):")
+        for rank, r in enumerate(sorted_results, 1):
+            cfg = r["config"]
+            log(f"{rank:2d}) acc={r['best_acc']*100:5.2f}% | lr={cfg.lr} wd={cfg.weight_decay} bs={cfg.batch_size} dpr={cfg.drop_path_rate}")
+    else:
+        log(f"{label} skipped: no configs found.")
+    return sorted_results, training_logs
+
+
+def run_one_hypertune(seed):
+    random.seed(seed)
     parser = argparse.ArgumentParser()
     parser.add_argument("--epochs", type=int, default=90)
     parser.add_argument("--warmup_epochs", type=int, default=5)
@@ -334,19 +375,34 @@ def main():
     parser.add_argument("--phase_epochs", type=int, default=None,
                         help="Override epochs per phase (defaults to total/3).")
 
-    # Baseline (phase 1) hyperparameters.
+    #test hyperparameters for this
     parser.add_argument("--baseline_lrs", type=float, nargs="+", default=[3.3e-4])
-    parser.add_argument("--baseline_wds", type=float, nargs="+", default=[0.07])
+    parser.add_argument("--baseline_wds", type=float, nargs="+",default=[0.07])
     parser.add_argument("--baseline_bss", type=int, nargs="+", default=[128])
     parser.add_argument("--baseline_dprs", type=float, nargs="+", default=[0.20])
+
+    parser.add_argument("--grid_lrs", type=float, nargs="+", default=[3.3e-4])
+    parser.add_argument("--grid_wds", type=float, nargs="+",default=[0.07])
+    parser.add_argument("--grid_bss", type=int, nargs="+", default=[128])
+    parser.add_argument("--grid_dprs", type=float, nargs="+", default=[0.20])
+    parser.add_argument("--results_out", type=str, default="phase_results.txt",
+                        help="Path to save printed results.")
+    
+    
+    #TODO: uncomment when sending to Mark
+    '''# Baseline (phase 1) hyperparameters.
+    parser.add_argument("--baseline_lrs", type=float, nargs="+", default=[1e-4, 3.3e-4, 1e-3])
+    parser.add_argument("--baseline_wds", type=float, nargs="+", default=[0.02, 0.07, 0.15])
+    parser.add_argument("--baseline_bss", type=int, nargs="+", default=[64, 128, 256])
+    parser.add_argument("--baseline_dprs", type=float, nargs="+", default=[0.0, 0.10, 0.20, 0.40])
 
     # Grid (phases 2 & 3) hyperparameters.
     parser.add_argument("--grid_lrs", type=float, nargs="+", default=[1e-4, 3.3e-4, 1e-3])
     parser.add_argument("--grid_wds", type=float, nargs="+", default=[0.02, 0.07, 0.15])
     parser.add_argument("--grid_bss", type=int, nargs="+", default=[64, 128, 256])
-    parser.add_argument("--grid_dprs", type=float, nargs="+", default=[0.10, 0.20, 0.40])
+    parser.add_argument("--grid_dprs", type=float, nargs="+", default=[0.0, 0.10, 0.20, 0.40])
     parser.add_argument("--results_out", type=str, default="phase_results.txt",
-                        help="Path to save printed results.")
+                        help="Path to save printed results.")'''
 
     args = parser.parse_args()
     set_seed(args.seed)
@@ -367,44 +423,26 @@ def main():
     phase_epochs = args.phase_epochs or args.epochs // 3
     phase_lengths = [int(phase_epochs/2), phase_epochs, max(1, args.epochs - int(phase_epochs/2)- phase_epochs)]
 
-    def run_phase(search_space, epochs, label, initial_state=None):
-        log(f"\n{label}: total runs={len(search_space)}, epochs per run={epochs}")
-        results: List[Dict[str, Any]] = []
-        start_phase = time.time()
-        for i, (lr, wd, bs, dpr) in enumerate(search_space, 1):
-            log("\n" + "=" * 64)
-            log(f"{label} run {i}/{len(search_space)} | lr={lr} wd={wd} bs={bs} drop_path_rate={dpr}")
-            log("=" * 64)
-            cfg = RunConfig(lr=lr, weight_decay=wd, batch_size=bs, drop_path_rate=dpr)
-            res = run_training(cfg, epochs=epochs, warmup_epochs=args.warmup_epochs,
-                               min_lr=args.min_lr, device=device, num_workers=args.num_workers,
-                               log_fn=log, initial_state=initial_state)
-            results.append(res)
-
-        elapsed_phase = time.time() - start_phase
-        log(f"\n{label} finished in {elapsed_phase/60:.1f} min\n")
-
-        sorted_results = sorted(results, key=lambda r: r["best_acc"], reverse=True)
-        if sorted_results:
-            log(f"{label} leaderboard (best test accuracy):")
-            for rank, r in enumerate(sorted_results, 1):
-                cfg = r["config"]
-                log(f"{rank:2d}) acc={r['best_acc']*100:5.2f}% | lr={cfg.lr} wd={cfg.weight_decay} bs={cfg.batch_size} dpr={cfg.drop_path_rate}")
-        else:
-            log(f"{label} skipped: no configs found.")
-        return sorted_results
-
+    
     phase_results = []
-    phase1 = run_phase(baseline_space, phase_lengths[0], "Phase 1 (baseline)")
+    phase1, log1 = run_phase(baseline_space, phase_lengths[0], "Phase 1 (baseline)")
     phase1_best_state = phase1[0]["final_state"] if phase1 else None
     phase_results.append(phase1)
 
-    phase2 = run_phase(grid_space, phase_lengths[1], "Phase 2 (grid search)", initial_state=phase1_best_state)
+    phase2, log2 = run_phase(grid_space, phase_lengths[1], "Phase 2 (grid search)", initial_state=phase1_best_state)
     phase2_best_state = phase2[0]["final_state"] if phase2 else None
     phase_results.append(phase2)
 
-    phase3 = run_phase(grid_space, phase_lengths[2], "Phase 3 (grid search)", initial_state=phase2_best_state)
+    phase3, log3 = run_phase(grid_space, phase_lengths[2], "Phase 3 (grid search)", initial_state=phase2_best_state)
     phase_results.append(phase3)
+    
+    dfs = [log1, log2, log3]          # Replace with your training logs
+    sheet_names = ['Phase_1', 'Phase_2', 'Phase_3']  # Names for each sheet
+    # Create an Excel file with multiple sheets
+    with pd.ExcelWriter("training_logs.xlsx", engine="openpyxl") as writer:
+        for df, sheet in zip(dfs, sheet_names):
+            df.to_excel(writer, sheet_name=sheet, index=False)
+
 
     log("\nSummary of best configs per phase:")
     for label, results in zip(
@@ -422,5 +460,7 @@ def main():
         f.write("\n".join(log_lines))
     log(f"\nSaved results to {args.results_out}")
 
+def main(seed):
+    for seed in [4721, 8154, 2398, 6932, 1567]: run_one_hypertune(seed)
 if __name__ == "__main__":
     main()

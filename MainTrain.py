@@ -223,6 +223,12 @@ def build_dataloaders(batch_size: int, num_workers: int = 4) -> Tuple[DataLoader
 
     train_ds = datasets.CIFAR10(root="./data", train=True, transform=train_tf, download=True)
     test_ds = datasets.CIFAR10(root="./data", train=False, transform=test_tf, download=True)
+    
+    #TODO: re-adjust when sending to Mark.
+    # Pick first 100 indices
+    train_ds = torch.utils.data.Subset(train_ds, list(range(100)))
+    test_ds = torch.utils.data.Subset(test_ds, list(range(100)))
+
 
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,
                               num_workers=num_workers, pin_memory=True)
@@ -285,6 +291,7 @@ def evaluate(model, loader, device):
 def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
                  device: torch.device, num_workers: int = 4) -> Dict[str, Any]:
     train_loader, test_loader = build_dataloaders(cfg.batch_size, num_workers)
+    
     model = ViTSmallCIFAR(
         num_classes=10, img_size=32, patch_size=4,
         embed_dim=384, depth=12, num_heads=6, mlp_ratio=4.0,
@@ -297,7 +304,7 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
     total_steps = epochs * math.ceil(50000 / cfg.batch_size)
     warmup_steps = warmup_epochs * math.ceil(50000 / cfg.batch_size)
     scheduler = WarmupCosineLR(optimizer, total_steps=total_steps, warmup_steps=warmup_steps, min_lr=min_lr)
-    training_log = {}
+    training_log = []
     best_acc = 0.0
     for epoch in range(epochs):
         train_loss, train_acc = train_one_epoch(model, train_loader, optimizer, scaler, device)
@@ -311,7 +318,7 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
         scheduler.last_epoch = (epoch + 1) * math.ceil(50000 / cfg.batch_size) - 1
         scheduler.step()
         update_str = f"epoch {epoch+1:03d}/{epochs} | loss {train_loss:.4f} | train_acc {train_acc*100:5.2f}% | test_acc {test_acc*100:5.2f}%"
-        training_log = [cfg.lr, cfg.weight_decay, cfg.batch_size, cfg.drop_path_rate, train_loss, train_acc, test_acc]
+        training_log.append([cfg.lr, cfg.weight_decay, cfg.batch_size, cfg.drop_path_rate, train_loss, train_acc, test_acc])
         print(update_str)
 
     return {
@@ -327,7 +334,9 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
 def run_one_hypertune(seed):
     random.seed(seed)
     parser = argparse.ArgumentParser()
-    parser.add_argument("--epochs", type=int, default=150)
+    #TODO: re-adjust parameters when sending to Mark.
+    #parser.add_argument("--epochs", type=int, default=150)
+    parser.add_argument("--epochs", type=int, default=5)
     parser.add_argument("--warmup_epochs", type=int, default=5)
     parser.add_argument("--min_lr", type=float, default=1e-5)
     parser.add_argument("--num_workers", type=int, default=4)
@@ -336,8 +345,8 @@ def run_one_hypertune(seed):
     # Default grids. Adjust as needed.
     # parser.add_argument("--lrs", type=float, nargs="+", default=[1e-4, 3.3e-4, 1e-3])
     # parser.add_argument("--wds", type=float, nargs="+",default=[0.02, 0.07, 0.15])
-    # parser.add_argument("--bss", type=int, nargs="+", default=[128, 256, 512])
-    # parser.add_argument("--dprs", type=float, nargs="+", default=[0.00, 0.10, 0.20])
+    # parser.add_argument("--bss", type=int, nargs="+", default=[64, 128, 256])
+    # parser.add_argument("--dprs", type=float, nargs="+", default=[0.00, 0.10, 0.20, 0.40])
 
     parser.add_argument("--lrs", type=float, nargs="+", default=[3.3e-4])
     parser.add_argument("--wds", type=float, nargs="+",default=[0.07])
@@ -356,6 +365,8 @@ def run_one_hypertune(seed):
 
     start_all = time.time()
     training_logs = []
+    best_training_log = None
+    best_acc = float('-inf')
     for i, (lr, wd, bs, dpr) in enumerate(search_space, 1):
         print("\n" + "=" * 64)
         print(f"run {i}/{len(search_space)} | lr={lr} wd={wd} bs={bs} drop_path_rate={dpr}")
@@ -363,12 +374,13 @@ def run_one_hypertune(seed):
         cfg = RunConfig(lr=lr, weight_decay=wd, batch_size=bs, drop_path_rate=dpr)
         res = run_training(cfg, epochs=args.epochs, warmup_epochs=args.warmup_epochs,
                            min_lr=args.min_lr, device=device, num_workers=args.num_workers)
-        training_logs.append(res['training_log'])
+        if res['best_acc'] > best_acc:
+            best_training_log = res['training_log']
         results.append({"config": res['config'], "best_acc": res['best_acc']})
     elapsed = time.time() - start_all
     print(f"\nGrid search finished in {elapsed/60:.1f} min\n")
 
-    training_logs = pd.DataFrame(training_logs)
+    training_logs = pd.DataFrame(best_training_log)
     training_logs.columns = ['lr', 'wd', 'bs', 'dpr', 'train loss', 'train accuracy', 'test accuracy']
     training_logs.to_csv(f'base_run_with_seed_{seed}.csv')
     #now that training results are written, clear training_log to free memory
