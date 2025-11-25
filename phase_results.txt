@@ -7,7 +7,7 @@ Phase 1 (baseline) run 1/1 | lr=0.00033 wd=0.07 bs=128 drop_path_rate=0.2
 ================================================================
 epoch 001/1 | loss 2.3105 | train_acc 16.00% | test_acc  7.00%
 
-Phase 1 (baseline) finished in 0.5 min
+Phase 1 (baseline) finished in 0.6 min
 
 Phase 1 (baseline) leaderboard (best test accuracy):
  1) acc= 7.00% | lr=0.00033 wd=0.07 bs=128 dpr=0.2
@@ -21,7 +21,7 @@ Phase 2 (grid search) run 1/1 | lr=0.00033 wd=0.07 bs=128 drop_path_rate=0.2
 epoch 001/2 | loss 2.3229 | train_acc 18.00% | test_acc  7.00%
 epoch 002/2 | loss 2.3300 | train_acc 17.00% | test_acc 19.00%
 
-Phase 2 (grid search) finished in 1.0 min
+Phase 2 (grid search) finished in 1.1 min
 
 Phase 2 (grid search) leaderboard (best test accuracy):
  1) acc=19.00% | lr=0.00033 wd=0.07 bs=128 dpr=0.2
@@ -35,7 +35,7 @@ Phase 3 (grid search) run 1/1 | lr=0.00033 wd=0.07 bs=128 drop_path_rate=0.2
 epoch 001/2 | loss 2.1605 | train_acc 18.00% | test_acc 19.00%
 epoch 002/2 | loss 2.1411 | train_acc 21.00% | test_acc  7.00%
 
-Phase 3 (grid search) finished in 1.0 min
+Phase 3 (grid search) finished in 0.9 min
 
 Phase 3 (grid search) leaderboard (best test accuracy):
  1) acc=19.00% | lr=0.00033 wd=0.07 bs=128 dpr=0.2

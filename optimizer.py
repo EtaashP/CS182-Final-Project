@@ -15,6 +15,8 @@ class RunConfig:
     weight_decay: float
     batch_size: int
     drop_path_rate: float
+    epochs: int = None
+    warmup_epochs: int = None
 
 # Warmup + Cosine LR
 class WarmupCosineLR(_LRScheduler):
@@ -36,10 +38,3 @@ class WarmupCosineLR(_LRScheduler):
                 lr = self.min_lr + (base_lr - self.min_lr) * cosine
             lrs.append(lr)
         return lrs
-
-
-
-
-
-
-optimizer = AdamW(model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay, betas=(0.9, 0.999), eps=1e-8)
