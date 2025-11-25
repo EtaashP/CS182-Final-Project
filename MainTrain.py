@@ -61,8 +61,8 @@ def build_dataloaders(batch_size: int, num_workers: int = 4) -> Tuple[DataLoader
     
     #TODO: re-adjust when sending to Mark.
     # Pick first 100 indices
-    train_ds = torch.utils.data.Subset(train_ds, list(range(100)))
-    test_ds = torch.utils.data.Subset(test_ds, list(range(100)))
+    '''train_ds = torch.utils.data.Subset(train_ds, list(range(100)))
+    test_ds = torch.utils.data.Subset(test_ds, list(range(100)))'''
 
 
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,
@@ -163,23 +163,23 @@ def run_one_hypertune(seed):
     random.seed(seed)
     parser = argparse.ArgumentParser()
     #TODO: re-adjust parameters when sending to Mark.
-    #parser.add_argument("--epochs", type=int, default=150)
-    parser.add_argument("--epochs", type=int, default=5)
+    parser.add_argument("--epochs", type=int, default=90)
+    #parser.add_argument("--epochs", type=int, default=5)
     parser.add_argument("--warmup_epochs", type=int, default=5)
     parser.add_argument("--min_lr", type=float, default=1e-5)
     parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
 
     # Default grids. Adjust as needed.
-    # parser.add_argument("--lrs", type=float, nargs="+", default=[1e-4, 3.3e-4, 1e-3])
-    # parser.add_argument("--wds", type=float, nargs="+",default=[0.02, 0.07, 0.15])
-    # parser.add_argument("--bss", type=int, nargs="+", default=[64, 128, 256])
-    # parser.add_argument("--dprs", type=float, nargs="+", default=[0.00, 0.10, 0.20, 0.40])
+    parser.add_argument("--lrs", type=float, nargs="+", default=[1e-4, 3.3e-4, 1e-3])
+    parser.add_argument("--wds", type=float, nargs="+",default=[0.02, 0.07, 0.15])
+    parser.add_argument("--bss", type=int, nargs="+", default=[64, 128, 256])
+    parser.add_argument("--dprs", type=float, nargs="+", default=[0.00, 0.10, 0.20, 0.40])
 
-    parser.add_argument("--lrs", type=float, nargs="+", default=[3.3e-4])
+    '''parser.add_argument("--lrs", type=float, nargs="+", default=[3.3e-4])
     parser.add_argument("--wds", type=float, nargs="+",default=[0.07])
     parser.add_argument("--bss", type=int, nargs="+", default=[128])
-    parser.add_argument("--dprs", type=float, nargs="+", default=[0.20])
+    parser.add_argument("--dprs", type=float, nargs="+", default=[0.20])'''
 
     args = parser.parse_args()
     set_seed(args.seed)

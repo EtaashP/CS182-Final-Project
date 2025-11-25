@@ -57,8 +57,8 @@ def build_dataloaders(batch_size: int, num_workers: int = 4) -> Tuple[DataLoader
     train_ds = datasets.CIFAR10(root="./data", train=True, transform=train_tf, download=True)
     test_ds = datasets.CIFAR10(root="./data", train=False, transform=test_tf, download=True)
     #TODO: switch back when sending to mark
-    train_ds = torch.utils.data.Subset(train_ds, list(range(100)))
-    test_ds = torch.utils.data.Subset(test_ds, list(range(100)))
+    '''train_ds = torch.utils.data.Subset(train_ds, list(range(100)))
+    test_ds = torch.utils.data.Subset(test_ds, list(range(100)))'''
 
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,
                               num_workers=num_workers, pin_memory=True)
@@ -202,8 +202,8 @@ def run_one_hypertune(seed):
     random.seed(seed)
     parser = argparse.ArgumentParser()
     #TODO: switch back when sending to Mark
-    #parser.add_argument("--epochs", type=int, default=90)
-    parser.add_argument("--epochs", type=int, default=5)
+    parser.add_argument("--epochs", type=int, default=90)
+    #parser.add_argument("--epochs", type=int, default=5)
     parser.add_argument("--warmup_epochs", type=int, default=5)
     parser.add_argument("--min_lr", type=float, default=1e-5)
     parser.add_argument("--num_workers", type=int, default=4)
@@ -211,7 +211,7 @@ def run_one_hypertune(seed):
     parser.add_argument("--phase_epochs", type=int, default=None,
                         help="Override epochs per phase (defaults to total/3).")
 
-    #test hyperparameters for this
+    '''#test hyperparameters for this
     parser.add_argument("--baseline_lrs", type=float, nargs="+", default=[3.3e-4])
     parser.add_argument("--baseline_wds", type=float, nargs="+",default=[0.07])
     parser.add_argument("--baseline_bss", type=int, nargs="+", default=[128])
@@ -222,11 +222,11 @@ def run_one_hypertune(seed):
     parser.add_argument("--grid_bss", type=int, nargs="+", default=[128])
     parser.add_argument("--grid_dprs", type=float, nargs="+", default=[0.20])
     parser.add_argument("--results_out", type=str, default="phase_results.txt",
-                        help="Path to save printed results.")
+                        help="Path to save printed results.")'''
     
     
     #TODO: uncomment when sending to Mark
-    '''# Baseline (phase 1) hyperparameters.
+    # Baseline (phase 1) hyperparameters.
     parser.add_argument("--baseline_lrs", type=float, nargs="+", default=[1e-4, 3.3e-4, 1e-3])
     parser.add_argument("--baseline_wds", type=float, nargs="+", default=[0.02, 0.07, 0.15])
     parser.add_argument("--baseline_bss", type=int, nargs="+", default=[64, 128, 256])
@@ -238,7 +238,7 @@ def run_one_hypertune(seed):
     parser.add_argument("--grid_bss", type=int, nargs="+", default=[64, 128, 256])
     parser.add_argument("--grid_dprs", type=float, nargs="+", default=[0.0, 0.10, 0.20, 0.40])
     parser.add_argument("--results_out", type=str, default="phase_results.txt",
-                        help="Path to save printed results.")'''
+                        help="Path to save printed results.")
 
     args = parser.parse_args()
     set_seed(args.seed)
@@ -258,8 +258,8 @@ def run_one_hypertune(seed):
 
     phase_epochs = args.phase_epochs or args.epochs // 3
     #TODO: change back when sending to mark
-    #phase_lengths = [int(phase_epochs/2), phase_epochs, max(1, args.epochs - int(phase_epochs/2)- phase_epochs)]
-    phase_lengths = [1, 2, 2]
+    phase_lengths = [int(phase_epochs/2), phase_epochs, max(1, args.epochs - int(phase_epochs/2)- phase_epochs)]
+    #phase_lengths = [1, 2, 2]
     
     phase_results = []
     phase1, log1 = run_phase(baseline_space, phase_lengths[0], "Phase 1 (baseline)", args, log, device, initial_state=None)
