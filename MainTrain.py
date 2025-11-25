@@ -17,6 +17,8 @@ from torch.utils.data import DataLoader
 from torch.optim import AdamW
 from torch.optim.lr_scheduler import _LRScheduler
 from torchvision import datasets, transforms
+import pandas as pd
+
 
 # ---------------------------
 # Utilities
@@ -295,7 +297,7 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
     total_steps = epochs * math.ceil(50000 / cfg.batch_size)
     warmup_steps = warmup_epochs * math.ceil(50000 / cfg.batch_size)
     scheduler = WarmupCosineLR(optimizer, total_steps=total_steps, warmup_steps=warmup_steps, min_lr=min_lr)
-
+    training_log = {}
     best_acc = 0.0
     for epoch in range(epochs):
         train_loss, train_acc = train_one_epoch(model, train_loader, optimizer, scaler, device)
@@ -308,19 +310,22 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
         # Quick fix: recompute steps done and set last_epoch accordingly.
         scheduler.last_epoch = (epoch + 1) * math.ceil(50000 / cfg.batch_size) - 1
         scheduler.step()
-
-        print(f"epoch {epoch+1:03d}/{epochs} | loss {train_loss:.4f} | train_acc {train_acc*100:5.2f}% | test_acc {test_acc*100:5.2f}%")
+        update_str = f"epoch {epoch+1:03d}/{epochs} | loss {train_loss:.4f} | train_acc {train_acc*100:5.2f}% | test_acc {test_acc*100:5.2f}%"
+        training_log = [cfg.lr, cfg.weight_decay, cfg.batch_size, cfg.drop_path_rate, train_loss, train_acc, test_acc]
+        print(update_str)
 
     return {
         "config": cfg,
-        "best_acc": best_acc
+        "best_acc": best_acc,
+        "training_log":training_log
     }
 
 # ---------------------------
 # Grid Search
 # ---------------------------
 
-def main():
+def run_one_hypertune(seed):
+    random.seed(seed)
     parser = argparse.ArgumentParser()
     parser.add_argument("--epochs", type=int, default=150)
     parser.add_argument("--warmup_epochs", type=int, default=5)
@@ -350,6 +355,7 @@ def main():
     results: List[Dict[str, Any]] = []
 
     start_all = time.time()
+    training_logs = []
     for i, (lr, wd, bs, dpr) in enumerate(search_space, 1):
         print("\n" + "=" * 64)
         print(f"run {i}/{len(search_space)} | lr={lr} wd={wd} bs={bs} drop_path_rate={dpr}")
@@ -357,17 +363,26 @@ def main():
         cfg = RunConfig(lr=lr, weight_decay=wd, batch_size=bs, drop_path_rate=dpr)
         res = run_training(cfg, epochs=args.epochs, warmup_epochs=args.warmup_epochs,
                            min_lr=args.min_lr, device=device, num_workers=args.num_workers)
-        results.append(res)
-
+        training_logs.append(res['training_log'])
+        results.append({"config": res['config'], "best_acc": res['best_acc']})
     elapsed = time.time() - start_all
     print(f"\nGrid search finished in {elapsed/60:.1f} min\n")
 
+    training_logs = pd.DataFrame(training_logs)
+    training_logs.columns = ['lr', 'wd', 'bs', 'dpr', 'train loss', 'train accuracy', 'test accuracy']
+    training_logs.to_csv(f'base_run_with_seed_{seed}.csv')
+    #now that training results are written, clear training_log to free memory
+    training_logs = []
     # Leaderboard
     results = sorted(results, key=lambda r: r["best_acc"], reverse=True)
     print("Leaderboard (best test accuracy):")
     for rank, r in enumerate(results, 1):
         cfg = r["config"]
         print(f"{rank:2d}) acc={r['best_acc']*100:5.2f}% | lr={cfg.lr} wd={cfg.weight_decay} bs={cfg.batch_size} dpr={cfg.drop_path_rate}")
+
+
+def main():
+    for seed in [4721, 8154, 2398, 6932, 1567]: run_one_hypertune(seed)
 
 if __name__ == "__main__":
     main()
