@@ -1,4 +1,12 @@
-logs/
-training @*/
-logs/
-training @*/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.pt
+*.pth
+.Python
+.DS_Store
+data/
+*.tar.gz
+*.zip

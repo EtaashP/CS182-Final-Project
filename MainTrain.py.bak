@@ -9,6 +9,7 @@ import random
 import argparse
 from dataclasses import dataclass
 from typing import Tuple, Dict, Any, List
+import os
 
 import torch
 import torch.nn as nn
@@ -21,6 +22,21 @@ from torchvision import datasets, transforms
 # ---------------------------
 # Utilities
 # ---------------------------
+# use_amp = False
+# Disable FlashAttention / fused SDPA kernels
+# torch.backends.cuda.enable_flash_sdp(False)
+# torch.backends.cuda.enable_mem_efficient_sdp(False)
+# torch.backends.cuda.enable_math_sdp(True)
+
+# Disable Triton entirely
+# torch._dynamo.config.disable_triton = True
+# torch._inductor.config.triton.cudagraphs = False
+# torch._inductor.config.triton.enabled = False
+
+# Disable Tensor Cores (force unfused matmuls)
+# torch.backends.cuda.matmul.allow_tf32 = False
+# torch.backends.cuda.matmul.allow_fp16_reduced_precision_reduction = False
+
 
 def set_seed(seed: int = 42):
     random.seed(seed)
@@ -222,10 +238,17 @@ def build_dataloaders(batch_size: int, num_workers: int = 4) -> Tuple[DataLoader
     train_ds = datasets.CIFAR10(root="./data", train=True, transform=train_tf, download=True)
     test_ds = datasets.CIFAR10(root="./data", train=False, transform=test_tf, download=True)
 
+    # Clamp num_workers to a sensible maximum (leave one core free) and ensure non-negative
+    cpu_count = os.cpu_count() or 1
+    num_workers = max(0, min(num_workers, max(1, cpu_count - 1)))
+
+    # Only use pin_memory when CUDA is available (pinning on CPU-only runs can increase memory pressure)
+    pin_memory = torch.cuda.is_available()
+
     train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True,
-                              num_workers=num_workers, pin_memory=True)
+                              num_workers=num_workers, pin_memory=pin_memory)
     test_loader = DataLoader(test_ds, batch_size=512, shuffle=False,
-                             num_workers=num_workers, pin_memory=True)
+                             num_workers=num_workers, pin_memory=pin_memory)
     return train_loader, test_loader
 
 # ---------------------------
@@ -251,18 +274,21 @@ def train_one_epoch(model, loader, optimizer, scaler, device, mixup_alpha=None):
         targets = targets.to(device, non_blocking=True)
 
         optimizer.zero_grad(set_to_none=True)
-        with torch.cuda.amp.autocast(enabled=torch.cuda.is_available()):
-            logits = model(images)
-            loss = criterion(logits, targets)
+        # with torch.cuda.amp.autocast(enabled=torch.cuda.is_available()):
+        logits = model(images)
+        loss = criterion(logits, targets)
 
-        scaler.scale(loss).backward()
-        scaler.step(optimizer)
-        scaler.update()
+        loss.backward()
+        optimizer.step()
+        # scaler.scale(loss).backward()
+        # scaler.step(optimizer)
+        # scaler.update()
 
         bs = images.size(0)
         total_loss += loss.item() * bs
         total_acc += accuracy(logits.detach(), targets) * bs
         n += bs
+        time.sleep(0.1)
 
     return total_loss / n, total_acc / n
 
@@ -290,7 +316,8 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
     ).to(device)
 
     optimizer = AdamW(model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay, betas=(0.9, 0.999), eps=1e-8)
-    scaler = torch.cuda.amp.GradScaler(enabled=torch.cuda.is_available())
+    # scaler = torch.cuda.amp.GradScaler(enabled=torch.cuda.is_available())
+    scaler = None
 
     total_steps = epochs * math.ceil(50000 / cfg.batch_size)
     warmup_steps = warmup_epochs * math.ceil(50000 / cfg.batch_size)
@@ -322,22 +349,17 @@ def run_training(cfg: RunConfig, epochs: int, warmup_epochs: int, min_lr: float,
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--epochs", type=int, default=150)
+    parser.add_argument("--epochs", type=int, default=50)
     parser.add_argument("--warmup_epochs", type=int, default=5)
     parser.add_argument("--min_lr", type=float, default=1e-5)
     parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
 
     # Default grids. Adjust as needed.
-    # parser.add_argument("--lrs", type=float, nargs="+", default=[1e-4, 3.3e-4, 1e-3])
-    # parser.add_argument("--wds", type=float, nargs="+",default=[0.02, 0.07, 0.15])
-    # parser.add_argument("--bss", type=int, nargs="+", default=[128, 256, 512])
-    # parser.add_argument("--dprs", type=float, nargs="+", default=[0.00, 0.10, 0.20])
-
-    parser.add_argument("--lrs", type=float, nargs="+", default=[3.3e-4])
-    parser.add_argument("--wds", type=float, nargs="+",default=[0.07])
-    parser.add_argument("--bss", type=int, nargs="+", default=[128])
-    parser.add_argument("--dprs", type=float, nargs="+", default=[0.20])
+    parser.add_argument("--lrs", type=float, nargs="+", default=[3e-4, 1e-3, 3e-3])
+    parser.add_argument("--wds", type=float, nargs="+",default=[0.02, 0.07, 0.15])
+    parser.add_argument("--bss", type=int, nargs="+", default=[128, 512])
+    parser.add_argument("--dprs", type=float, nargs="+", default=[0.00, 0.10 ,0.20])
 
     args = parser.parse_args()
     set_seed(args.seed)
