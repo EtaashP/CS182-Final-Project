@@ -207,7 +207,6 @@ def run_one_hypertune(seed):
     parser.add_argument("--warmup_epochs", type=int, default=5)
     parser.add_argument("--min_lr", type=float, default=1e-5)
     parser.add_argument("--num_workers", type=int, default=4)
-    parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--phase_epochs", type=int, default=None,
                         help="Override epochs per phase (defaults to total/3).")
 
@@ -241,7 +240,6 @@ def run_one_hypertune(seed):
                         help="Path to save printed results.")
 
     args = parser.parse_args()
-    set_seed(args.seed)
 
     log_lines: List[str] = []
     def log(msg: str = ""):
