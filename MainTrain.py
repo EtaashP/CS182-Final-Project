@@ -267,7 +267,7 @@ def run_training(cfg:RunConfig, epochs:int, warmup_epochs:int, min_lr:float, dev
 def run_one_hypertune(seed):
     random.seed(seed)
     parser = argparse.ArgumentParser()
-    parser.add_argument("--epochs",type=int,default=50)
+    parser.add_argument("--epochs",type=int,default=60)
     parser.add_argument("--warmup_epochs",type=int,default=5)
     parser.add_argument("--min_lr",type=float,default=1e-5)
     parser.add_argument("--num_workers",type=int,default=4)
